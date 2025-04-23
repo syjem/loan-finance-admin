@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ import { useClientInfo } from "@/hooks/useClientInfo";
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { FormSchema } from "@/lib/zod-schema";
+import { getInitials } from "@/lib/utils";
 
 type NewDealsFormProps = {
   form: UseFormReturn<z.infer<typeof FormSchema>>;
@@ -62,6 +63,9 @@ const NewDealsForm = ({ form, onSubmit }: NewDealsFormProps) => {
                                 src={client.avatar}
                                 alt={client.name}
                               />
+                              <AvatarFallback className="text-xs">
+                                {getInitials(client.name)}
+                              </AvatarFallback>
                             </Avatar>
                             <span className="font-semibold">{client.name}</span>
                           </div>
