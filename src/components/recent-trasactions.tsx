@@ -13,7 +13,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getInitials } from "@/lib/utils";
+import { formatCurrency, getInitials } from "@/lib/utils";
 import { RefreshCw } from "lucide-react";
 
 type Transaction = {
@@ -57,7 +57,7 @@ const RecentTransactions = () => {
                       </div>
                     </div>
 
-                    <span>{item.value}</span>
+                    <span>{formatCurrency(item.value)}</span>
                   </li>
                 </TooltipTrigger>
                 <TooltipContent>
