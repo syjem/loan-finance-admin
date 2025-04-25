@@ -1,4 +1,6 @@
-import { useClientTransactions } from "./useTransaction";
+"use client";
+
+import { useTransactions } from "@/hooks/use-transaction";
 import { AxisOptions, ChartOptions } from "react-charts";
 
 type Metric = {
@@ -13,7 +15,7 @@ type DataPoint = {
 };
 
 export const useChart = () => {
-  const { transaction } = useClientTransactions();
+  const { transaction } = useTransactions();
 
   const y_max = () => {
     if (transaction.length > 0) {

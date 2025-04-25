@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Form,
   FormControl,
@@ -18,7 +20,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useClientInfo } from "@/hooks/useClientInfo";
+import { useClientInfo } from "@/hooks/use-client-info";
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { FormSchema } from "@/lib/zod-schema";
@@ -99,7 +101,7 @@ const NewDealsForm = ({ form, onSubmit }: NewDealsFormProps) => {
             render={({ field }) => (
               <FormItem className="flex flex-col justify-center gap-2">
                 <FormLabel htmlFor="title" className="text-right">
-                  What's the deal for:
+                  What`&apos`s the deal for:
                 </FormLabel>
                 <FormControl>
                   <Input {...field} id="title" className="col-span-3" />

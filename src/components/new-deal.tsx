@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 
 import {
@@ -13,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import supabase from "@/supabase-client";
+import { supabase } from "@/lib/supabase/client";
 import { FormSchema } from "@/lib/zod-schema";
 import NewDealsForm from "@/components/new-deals-form";
 
