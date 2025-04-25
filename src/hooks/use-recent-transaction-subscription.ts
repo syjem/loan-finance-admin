@@ -1,13 +1,15 @@
-import supabase from "@/supabase-client";
+"use client";
+
 import { useSWRConfig } from "swr";
 import useSWRSubscription from "swr/subscription";
+import { supabase } from "@/lib/supabase/client";
 
-export const useTransactionSubscription = () => {
+export const useRecentTransactionSubscription = () => {
   const { mutate } = useSWRConfig();
 
-  useSWRSubscription("transactions", (key, { next }) => {
+  useSWRSubscription("recent_transactions", (key, { next }) => {
     const channel = supabase
-      .channel("deal-changes")
+      .channel("recent-transaction")
       .on(
         "postgres_changes",
         {

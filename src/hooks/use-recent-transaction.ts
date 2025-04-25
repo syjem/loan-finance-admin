@@ -1,5 +1,7 @@
+"use client";
+
 import useSWR from "swr";
-import supabase from "@/supabase-client";
+import { supabase } from "@/lib/supabase/client";
 
 const getRecentTransactions = async () => {
   const { data, error } = await supabase
@@ -12,7 +14,7 @@ const getRecentTransactions = async () => {
 };
 
 export const useRecentTransactions = () => {
-  const { data } = useSWR("recent_trancations", getRecentTransactions);
+  const { data } = useSWR("recent_transactions", getRecentTransactions);
 
   return { recent_transactions: data };
 };

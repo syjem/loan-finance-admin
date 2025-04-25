@@ -1,4 +1,6 @@
-import supabase from "@/supabase-client";
+"use client";
+
+import { supabase } from "@/lib/supabase/client";
 import useSWR from "swr";
 
 const getClientTransactions = async () => {
@@ -11,7 +13,7 @@ const getClientTransactions = async () => {
   return data;
 };
 
-export const useClientTransactions = () => {
+export const useTransactions = () => {
   const { data } = useSWR("transactions", getClientTransactions);
 
   return { transaction: data || [] };

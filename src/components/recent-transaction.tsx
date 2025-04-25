@@ -1,0 +1,60 @@
+"use client";
+
+import { useRecentTransactions } from "@/hooks/use-recent-transaction";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { formatCurrency, getInitials } from "@/lib/utils";
+import { useRecentTransactionSubscription } from "@/hooks/use-recent-transaction-subscription";
+
+type Transaction = {
+  name: string;
+  email: string;
+  avatar: string;
+  value: number;
+  title: string;
+};
+
+const RecentTransactions = () => {
+  useRecentTransactionSubscription();
+  const { recent_transactions: recent } = useRecentTransactions();
+  return (
+    <Card className="shadow-md border bg-muted/50">
+      <CardHeader>
+        <CardTitle className="font-semibold text-lg">
+          Recent Transactions
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ul className="flex flex-col gap-4">
+          {recent?.map((item: Transaction, i) => (
+            <li key={i} className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Avatar>
+                  <AvatarImage src={item.avatar} alt={item.name} />
+                  <AvatarFallback className="text-xs">
+                    {getInitials(item.name)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col leading-5">
+                  <span className="font-semibold text-start">{item.name}</span>
+                  <span
+                    title={item.email}
+                    className="text-muted-foreground/60 truncate max-w-[180px]"
+                  >
+                    {item.email}
+                  </span>
+                </div>
+              </div>
+
+              <span className="font-semibold">
+                {formatCurrency(item.value)}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </CardContent>
+    </Card>
+  );
+};
+
+export default RecentTransactions;

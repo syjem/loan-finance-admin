@@ -1,4 +1,6 @@
-import supabase from "@/supabase-client";
+"use client";
+
+import { supabase } from "@/lib/supabase/client";
 import useSWR from "swr";
 
 const getCleints = async () => {
