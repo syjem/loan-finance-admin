@@ -48,7 +48,7 @@ const CustomCard = async ({
   type: "transactions" | "customers" | "totalValue";
 }) => {
   const Icon = iconType[type];
-  const resolvedValue = value instanceof Promise ? await value : value;
+  const resolvedValue = await value;
 
   return (
     <Card className="bg-muted/50">
