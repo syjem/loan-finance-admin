@@ -1,49 +1,38 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createClientCheck } from "@/lib/supabase/create-client-check";
 
 export const getTotalCustomers = async () => {
-  const supabase = createClient();
-  const { count, error } = await (await supabase)
-    .from("customers")
-    .select("*", { count: "exact", head: true });
+  const result = await createClientCheck(async (supabase) => {
+    const { count, error } = await supabase
+      .from("customers")
+      .select("*", { count: "exact", head: true });
 
-  if (error) {
-    throw new Error(`Failed to fetch customers count: ${error.message}`);
-  }
+    if (error) throw new Error(error.message);
 
-  return count;
+    return count ?? 0;
+  });
+
+  return result ?? 0;
 };
 
-export const getTotalTransactions = async () => {
-  const supabase = createClient();
-  const { count, error } = await (await supabase)
-    .from("transactions")
-    .select("*", { count: "exact", head: true });
+export const getTransactionStats = async () => {
+  const result = await createClientCheck(async (supabase) => {
+    const { count: totalTransactions } = await supabase
+      .from("transactions")
+      .select("*", { count: "exact", head: true });
 
-  if (error) {
-    throw new Error(`Failed to fetch transactions count: ${error.message}`);
-  }
+    const { data } = await supabase.from("transactions").select("value");
 
-  return count;
-};
+    const transactionsTotalValue = data
+      ? data.reduce((acc, tx) => acc + tx.value, 0)
+      : 0;
 
-export const getTransactionsTotalValue = async () => {
-  const supabase = createClient();
-  const { data, error } = await (await supabase)
-    .from("transactions")
-    .select("value", { count: "exact", head: false });
+    return {
+      totalTransactions: totalTransactions ?? 0,
+      transactionsTotalValue,
+    };
+  });
 
-  if (error) {
-    throw new Error(
-      `Failed to fetch total value of transactions: ${error.message}`
-    );
-  }
-
-  const totalValue = data.reduce(
-    (acc, transaction) => acc + transaction.value,
-    0
-  );
-
-  return totalValue ?? 0;
+  return result ?? { totalTransactions: 0, transactionsTotalValue: 0 };
 };

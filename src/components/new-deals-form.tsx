@@ -101,7 +101,7 @@ const NewDealsForm = ({ form, onSubmit }: NewDealsFormProps) => {
             render={({ field }) => (
               <FormItem className="flex flex-col justify-center gap-2">
                 <FormLabel htmlFor="title" className="text-right">
-                  What`&apos`s the deal for:
+                  What&apos;s the deal for:
                 </FormLabel>
                 <FormControl>
                   <Input {...field} id="title" className="col-span-3" />
