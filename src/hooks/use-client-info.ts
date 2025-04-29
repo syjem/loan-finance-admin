@@ -14,7 +14,7 @@ const getCleints = async () => {
 };
 
 export const useClientInfo = () => {
-  const { data } = useSWR("clients", getCleints);
+  const { data } = useSWR("clients", getCleints, { revalidateOnFocus: false });
 
   return {
     clients: data || [],

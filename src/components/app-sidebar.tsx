@@ -20,14 +20,14 @@ const items = [
     icon: LayoutDashboard,
   },
   {
+    title: "Clients",
+    url: "/clients",
+    icon: Users,
+  },
+  {
     title: "Transactions",
     url: "/transactions",
     icon: CreditCard,
-  },
-  {
-    title: "Customers",
-    url: "/customers",
-    icon: Users,
   },
 ];
 

@@ -1,10 +1,9 @@
 "use client";
 
-import { useRecentTransactions } from "@/hooks/use-recent-transaction";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatCurrency, getInitials } from "@/lib/utils";
-import { useRecentTransactionSubscription } from "@/hooks/use-recent-transaction-subscription";
+import { useRecentTransactions } from "@/hooks/subscriptions/use-recent-transactions";
 
 type Transaction = {
   name: string;
@@ -14,9 +13,12 @@ type Transaction = {
   title: string;
 };
 
-const RecentTransactions = () => {
-  useRecentTransactionSubscription();
-  const { recent_transactions: recent } = useRecentTransactions();
+const RecentTransactionsClient = ({
+  initialData,
+}: {
+  initialData: Transaction[];
+}) => {
+  const { data: recent = initialData } = useRecentTransactions();
   return (
     <Card className="shadow-md border bg-muted/50">
       <CardHeader>
@@ -57,4 +59,4 @@ const RecentTransactions = () => {
   );
 };
 
-export default RecentTransactions;
+export default RecentTransactionsClient;

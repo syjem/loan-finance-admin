@@ -36,3 +36,23 @@ export const getTransactionStats = async () => {
 
   return result ?? { totalTransactions: 0, transactionsTotalValue: 0 };
 };
+
+export const getClientsTotalValue = async () => {
+  const result = await createClientCheck(async (supabase) => {
+    const { data } = await supabase.from("customer_total_value").select("*");
+
+    return data;
+  });
+
+  return result;
+};
+
+export const getRecentTransactions = async () => {
+  const result = await createClientCheck(async (supabase) => {
+    const { data } = await supabase.from("recent_transactions").select("*");
+
+    return data;
+  });
+
+  return result;
+};

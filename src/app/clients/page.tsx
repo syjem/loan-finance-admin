@@ -9,7 +9,7 @@ const CustomersPage = () => {
         <SidebarTrigger className="-ml-1" />
         <Separator orientation="vertical" className="h-2 -ml-1" />
         <h1 className="text-base md:text-lg font-[500] tracking-tight">
-          Customers
+          Clients
         </h1>
       </header>
     </>

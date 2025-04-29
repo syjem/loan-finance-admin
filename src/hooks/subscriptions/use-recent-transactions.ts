@@ -1,17 +1,18 @@
 "use client";
 
-import { useSWRConfig } from "swr";
+import useSWR from "swr";
 import useSWRSubscription from "swr/subscription";
 import { supabase } from "@/lib/supabase/client";
+import { getRecentTransactions } from "@/app/supabase-queries";
 
-export const transactionStatsKey = "realtime_transactions";
+export const key = "recent_transactions";
 
-export const useTransactionsRealtimeUpdate = () => {
-  const { mutate } = useSWRConfig();
+export const useRecentTransactions = () => {
+  const swr = useSWR(key, getRecentTransactions, { revalidateOnFocus: false });
 
-  useSWRSubscription("realtime_transactions", (key, { next }) => {
+  useSWRSubscription(key, (key, { next }) => {
     const channel = supabase
-      .channel("realtime-transactions")
+      .channel("recent-transactions")
       .on(
         "postgres_changes",
         {
@@ -20,8 +21,7 @@ export const useTransactionsRealtimeUpdate = () => {
           table: "transactions",
         },
         (payload) => {
-          console.log("Realtime Update:", payload.new);
-          mutate(key);
+          swr.mutate();
           next(null, payload.new);
         }
       )
@@ -31,4 +31,6 @@ export const useTransactionsRealtimeUpdate = () => {
       supabase.removeChannel(channel);
     };
   });
+
+  return swr;
 };

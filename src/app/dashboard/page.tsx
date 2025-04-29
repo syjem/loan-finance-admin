@@ -1,9 +1,10 @@
 import TransactionChart from "@/components/chart";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import RecentTransactions from "@/components/recent-transaction";
+import RecentTransactionServer from "@/components/recent-transaction-server";
 import ChartHeader from "@/components/chart-header";
 import { DashboardInfoCards } from "@/components/info-card";
 import { Separator } from "@/components/ui/separator";
+import { Suspense } from "react";
 
 export default function Dashboard() {
   return (
@@ -25,7 +26,9 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="col-span-1 rounded-xl h-full">
-          <RecentTransactions />
+          <Suspense>
+            <RecentTransactionServer />
+          </Suspense>
         </div>
       </div>
     </>

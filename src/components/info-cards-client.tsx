@@ -1,18 +1,13 @@
 "use client";
 
-import {
-  useTransactionsRealtimeUpdate,
-  transactionStatsKey,
-} from "@/hooks/subscriptions/use-realtime-transaction";
-import useSWR from "swr";
-import { getTransactionStats } from "@/app/actions";
 import { DollarSign, CreditCard, Users } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useTransactionStats } from "@/hooks/subscriptions/use-transaction-stats";
 
 const iconType = {
   totalValue: DollarSign,
-  customers: Users,
+  clients: Users,
   transactions: CreditCard,
 };
 
@@ -28,20 +23,11 @@ export const DashboardInfoCardsClient = ({
   numberOfCustomers,
   initialStats,
 }: Props) => {
-  useTransactionsRealtimeUpdate();
-
-  const { data: stats = initialStats } = useSWR(
-    transactionStatsKey,
-    getTransactionStats
-  );
+  const { data: stats = initialStats } = useTransactionStats();
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      <CustomCard
-        title="Customers"
-        value={numberOfCustomers}
-        type="customers"
-      />
+      <CustomCard title="Clients" value={numberOfCustomers} type="clients" />
       <CustomCard
         title="Transactions"
         value={stats.totalTransactions}
@@ -59,7 +45,7 @@ export const DashboardInfoCardsClient = ({
 type CardProps = {
   title: string;
   value: number | null;
-  type: "transactions" | "customers" | "totalValue";
+  type: "transactions" | "clients" | "totalValue";
 };
 
 const CustomCard = ({ title, value, type }: CardProps) => {

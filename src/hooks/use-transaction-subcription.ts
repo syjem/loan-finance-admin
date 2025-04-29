@@ -18,7 +18,6 @@ export const useTransactionSubscription = () => {
           table: "transactions",
         },
         (payload) => {
-          console.log("Change received:", payload.new);
           mutate(key);
           next(null, payload.new);
         }
