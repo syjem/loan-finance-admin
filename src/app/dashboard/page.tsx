@@ -5,6 +5,7 @@ import ChartHeader from "@/components/chart-header";
 import { DashboardInfoCards } from "@/components/info-card";
 import { Separator } from "@/components/ui/separator";
 import { Suspense } from "react";
+import RecentTransactionSkeleton from "@/components/fallback-ui/recent-transactions";
 
 export default function Dashboard() {
   return (
@@ -26,7 +27,7 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="col-span-1 rounded-xl h-full">
-          <Suspense>
+          <Suspense fallback={<RecentTransactionSkeleton />}>
             <RecentTransactionServer />
           </Suspense>
         </div>
