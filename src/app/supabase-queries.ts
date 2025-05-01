@@ -56,3 +56,13 @@ export const getRecentTransactions = async () => {
 
   return result;
 };
+
+export const getClients = async () => {
+  const result = await createClientCheck(async (supabase) => {
+    const { data } = await supabase.from("customers").select("*");
+
+    return data;
+  });
+
+  return result;
+};
