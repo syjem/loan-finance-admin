@@ -1,12 +1,12 @@
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import React from "react";
-import { getClients } from "@/app/supabase-queries";
+import { getClientsTotalValue } from "@/app/supabase-queries";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
 
 const ClientsPage = async () => {
-  const clients = await getClients();
+  const clients = await getClientsTotalValue();
   return (
     <>
       <header className="flex h-4 shrink-0 items-center gap-2">

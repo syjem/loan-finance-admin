@@ -19,3 +19,13 @@ export const formatCurrency = (amount: number) => {
     currency: "USD",
   }).format(amount);
 };
+
+export const formatDate = (isoDate: string) => {
+  const date = new Date(isoDate);
+  const formatted = date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+  });
+
+  return formatted;
+};
