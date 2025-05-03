@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# "DealTrack" – A Lending Admin Dashboard
 
-## Getting Started
+A back-office tool for loan agents or finance admins to track:
 
-First, run the development server:
+- **Loan applications (deals)**
+- **Clients (borrowers)**
+- **Loan amounts, statuses, and timelines**
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🎯 Your Role in the App (as admin user)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Only internal users (like admins, analysts, or loan officers) will use the app.  
+No client-side logins or portals.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+### 👤 Clients
 
-To learn more about Next.js, take a look at the following resources:
+- Name, email, phone, address
+- Status: **Active / Inactive**
+- Credit Score or Rating (optional)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 💰 Deals / Loans
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Loan Amount
+- Term (e.g. 12 months)
+- Status: **Approved / Rejected / Pending / Completed**
+- Purpose: **Education, Personal, Business**
+- Date of Deal
 
-## Deploy on Vercel
+### 💳 Transactions (Optional for now)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Payment Received
+- Type (e.g. initial disbursement, interest, repayment)
+- Notes / Receipt
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 📊 Dashboard Highlights
+
+- Total loan value
+- Number of clients
+- New deals this month
+- Top borrowers (by loan amount)
+- Graphs by deal status or monthly deals
+
+---
+
+## 🔒 Auth & Permissions
+
+- Only **admins** can log in
+- Admins can **add/edit/delete everything**
+
+---
+
+## 🧠 Real-Life Business Angle
+
+This app:
+
+- Could be used by a small lending firm or cooperative
+- Could be expanded into something bigger (if needed)
+- Demonstrates **CRUD**, **auth**, **realtime updates**, and **data analytics**
+
+---
+
+## 📈 Future-Proofing Potential
+
+Additional for later:
+
+- Payment tracking and loan completion logic
+- PDF invoice generation
+- Client follow-up reminders
+- Audit logs of who changed what and when
+
+---
+
+### Why this app?:
+
+- ✅ **Real-world use case**
+- ✅ **Manageable scope**
+- ✅ **Tech stack that showcases your skills**
