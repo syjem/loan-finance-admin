@@ -1,7 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, ArrowUpDown } from "lucide-react";
+import { MoreHorizontal, ArrowUpDown, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -17,9 +17,8 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { CalendarIcon } from "lucide-react";
+import { formatCurrency, getInitials } from "@/lib/utils";
 import Link from "next/link";
-import { formatCurrency, formatDate, getInitials } from "@/lib/utils";
 
 export type Clients = {
   id: string;
@@ -28,8 +27,7 @@ export type Clients = {
   avatar: string;
   total_value: number;
   transaction_count: number;
-  created_at: string;
-  bio: string;
+  address: string;
 };
 
 export const columns: ColumnDef<Clients>[] = [
@@ -42,20 +40,15 @@ export const columns: ColumnDef<Clients>[] = [
       return (
         <HoverCard>
           <HoverCardTrigger asChild>
-            <Link
-              href={`clients/${client.id}`}
-              className="flex items-center gap-4 group"
-            >
+            <div className="flex items-center gap-4">
               <Avatar>
                 <AvatarImage src={client.avatar}></AvatarImage>
                 <AvatarFallback className="text-xs">
                   {getInitials(client.name)}
                 </AvatarFallback>
               </Avatar>
-              <span className="font-bold group-hover:underline">
-                {client.name}
-              </span>
-            </Link>
+              <span className="font-bold">{client.name}</span>
+            </div>
           </HoverCardTrigger>
           <HoverCardContent className="w-80">
             <div className="flex space-x-4">
@@ -65,14 +58,14 @@ export const columns: ColumnDef<Clients>[] = [
                   {getInitials(client.name)}
                 </AvatarFallback>
               </Avatar>
-              <div className="space-y-1">
+              <div className="space-y-1 w-full">
                 <h4 className="text-sm font-bold">{client.name}</h4>
-                <p className="text-sm">{client.bio}</p>
-                <div className="flex items-center pt-2">
-                  <CalendarIcon className="mr-2 h-4 w-4 opacity-70" />{" "}
-                  <span className="text-xs text-muted-foreground">
-                    Joined {formatDate(client.created_at)}
-                  </span>
+                <p className="text-sm text-muted-foreground">{client.email}</p>
+                <p className="text-sm">{client.address}</p>
+                <div className="flex items-center justify-between pt-2">
+                  <Button asChild className="py-2 cursor-pointer">
+                    <Link href={`/clients/${client.id}`}>View profile</Link>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -146,7 +139,15 @@ export const columns: ColumnDef<Clients>[] = [
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <Link href={`clients/${client.id}`}>View client</Link>
+              <Button asChild className="py-2 cursor-pointer">
+                <Link
+                  href={`/clients/${client.id}`}
+                  className="flex items-center gap-1"
+                >
+                  <User className="h-4 w-4 text-white" />
+                  <span>View profile</span>
+                </Link>
+              </Button>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

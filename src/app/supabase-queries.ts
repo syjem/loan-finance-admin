@@ -56,3 +56,13 @@ export const getRecentTransactions = async () => {
 
   return result;
 };
+
+export const getClientById = async (id: string) => {
+  const result = await createClientCheck(async (supabase) => {
+    const { data } = await supabase.from("customers").select("*").eq("id", id);
+
+    return data;
+  });
+
+  return result;
+};
