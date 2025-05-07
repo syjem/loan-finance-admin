@@ -66,3 +66,17 @@ export const getClientById = async (id: string) => {
 
   return result;
 };
+
+export const getClientTransactionById = async (id: string) => {
+  const result = await createClientCheck(async (supabase) => {
+    const { data } = await supabase
+      .from("transactions")
+      .select("*")
+      .eq("customer_id", id)
+      .order("created_at", { ascending: false });
+
+    return data;
+  });
+
+  return result;
+};

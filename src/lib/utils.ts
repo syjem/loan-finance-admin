@@ -25,6 +25,7 @@ export const formatDate = (isoDate: string) => {
   const formatted = date.toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
+    day: "2-digit",
   });
 
   return formatted;

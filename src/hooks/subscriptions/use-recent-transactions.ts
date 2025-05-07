@@ -3,7 +3,7 @@
 import useSWR from "swr";
 import useSWRSubscription from "swr/subscription";
 import { supabase } from "@/lib/supabase/client";
-import { getRecentTransactions } from "@/app/supabase-queries";
+import { getRecentTransactions } from "@/app/data";
 
 export const key = "recent_transactions";
 
