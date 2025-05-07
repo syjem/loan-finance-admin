@@ -1,7 +1,7 @@
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import React from "react";
-import { getClientsTotalValue } from "@/app/supabase-queries";
+import { getClientsTotalValue } from "@/app/data";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
 

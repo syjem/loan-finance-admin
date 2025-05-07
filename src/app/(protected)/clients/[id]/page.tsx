@@ -1,4 +1,4 @@
-import { getClientById } from "@/app/supabase-queries";
+import { getClientById, getClientTransactionById } from "@/app/data";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import React from "react";
@@ -31,13 +31,14 @@ export type Client = {
 
 const ClientProfilePage = async ({ params }: ParamsType) => {
   const id = (await params).id;
-  const data = await getClientById(id);
-  const clientName =
-    data !== null ? data.map((client: Client) => client.name) : id;
+  const [client, transaction] = await Promise.all([
+    getClientById(id),
+    getClientTransactionById(id),
+  ]);
 
   return (
     <>
-      <header className="flex h-4 shrink-0 items-center gap-2 mb-12">
+      <header className="flex h-4 shrink-0 items-center gap-2 mb-4">
         <SidebarTrigger className="-ml-1" />
         <Separator orientation="vertical" className="h-2 -ml-1" />
         <Breadcrumb>
@@ -50,14 +51,16 @@ const ClientProfilePage = async ({ params }: ParamsType) => {
             <BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbPage className="font-semibold">
-                {clientName}
+                {client !== null
+                  ? client.map((client: Client) => client.name)
+                  : id}
               </BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
       </header>
 
-      <Main data={data ?? []} />
+      <Main client={client ?? []} transaction={transaction ?? []} />
     </>
   );
 };
