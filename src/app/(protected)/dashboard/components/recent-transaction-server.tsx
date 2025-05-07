@@ -1,7 +1,7 @@
-import { getRecentTransactions } from "@/app/supabase-queries";
+import { getRecentTransactions } from "@/app/data";
 
 import React from "react";
-import RecentTransactionsClient from "@/components/recent-transaction-client";
+import RecentTransactionsClient from "@/app/(protected)/dashboard/components/recent-transaction-client";
 
 const RecentTransactionServer = async () => {
   const data = await getRecentTransactions();

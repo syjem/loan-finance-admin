@@ -17,7 +17,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { supabase } from "@/lib/supabase/client";
 import { FormSchema } from "@/lib/zod-schema";
-import NewDealsForm from "@/components/new-deals-form";
+import NewDealsForm from "@/app/(protected)/dashboard/components/new-deals-form";
 
 const defaultValues = {
   customer_id: "",

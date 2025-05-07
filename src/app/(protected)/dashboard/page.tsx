@@ -1,11 +1,11 @@
-import TransactionChart from "@/components/chart";
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import RecentTransactionServer from "@/components/recent-transaction-server";
-import ChartHeader from "@/components/chart-header";
-import { DashboardInfoCards } from "@/components/info-card";
-import { Separator } from "@/components/ui/separator";
 import { Suspense } from "react";
+import { Separator } from "@/components/ui/separator";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import TransactionChart from "@/app/(protected)/dashboard/components/chart";
+import ChartHeader from "@/app/(protected)/dashboard/components/chart-header";
+import { DashboardInfoCards } from "@/app/(protected)/dashboard/components/info-card";
 import RecentTransactionSkeleton from "@/components/fallback-ui/recent-transactions";
+import RecentTransactionServer from "@/app/(protected)/dashboard/components/recent-transaction-server";
 
 export default function Dashboard() {
   return (

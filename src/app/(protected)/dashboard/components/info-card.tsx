@@ -1,5 +1,5 @@
-import { getTotalCustomers, getTransactionStats } from "@/app/supabase-queries";
-import { DashboardInfoCardsClient } from "@/components/info-cards-client";
+import { getTotalCustomers, getTransactionStats } from "@/app/data";
+import { DashboardInfoCardsClient } from "@/app/(protected)/dashboard/components/info-cards-client";
 
 export const DashboardInfoCards = async () => {
   const numberOfCustomers = await getTotalCustomers();
