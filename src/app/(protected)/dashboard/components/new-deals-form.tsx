@@ -97,14 +97,14 @@ const NewDealsForm = ({ form, onSubmit }: NewDealsFormProps) => {
           />
           <FormField
             control={form.control}
-            name="title"
+            name="purpose"
             render={({ field }) => (
               <FormItem className="flex flex-col justify-center gap-2">
-                <FormLabel htmlFor="title" className="text-right">
-                  What&apos;s the deal for:
+                <FormLabel htmlFor="purpose" className="text-right">
+                  Purpose:
                 </FormLabel>
                 <FormControl>
-                  <Input {...field} id="title" className="col-span-3" />
+                  <Input {...field} id="purpose" className="col-span-3" />
                 </FormControl>
                 <FormMessage />
               </FormItem>

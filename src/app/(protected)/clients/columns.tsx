@@ -59,7 +59,7 @@ export const columns: ColumnDef<Clients>[] = [
                 </AvatarFallback>
               </Avatar>
               <div className="space-y-1 w-full">
-                <h4 className="text-sm font-bold">{client.name}</h4>
+                <h4 className="text-sm">{client.name}</h4>
                 <p className="text-sm text-muted-foreground">{client.email}</p>
                 <p className="text-sm">{client.address}</p>
                 <div className="flex items-center justify-between pt-2">
@@ -77,6 +77,11 @@ export const columns: ColumnDef<Clients>[] = [
   {
     accessorKey: "email",
     header: "Email",
+    cell: ({ row }) => {
+      const client = row.original;
+
+      return <div className="text-muted-foreground">{client.email}</div>;
+    },
   },
   {
     accessorKey: "transaction_count",
@@ -94,7 +99,11 @@ export const columns: ColumnDef<Clients>[] = [
     cell: ({ row }) => {
       const client = row.original;
 
-      return <div className="pl-14">{client.transaction_count}</div>;
+      return (
+        <div className="pl-14 text-muted-foreground">
+          {client.transaction_count}
+        </div>
+      );
     },
   },
   {
@@ -114,7 +123,9 @@ export const columns: ColumnDef<Clients>[] = [
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("total_value"));
       const formatted = formatCurrency(amount);
-      return <div className="text-center font-medium">{formatted}</div>;
+      return (
+        <div className="text-center text-muted-foreground">{formatted}</div>
+      );
     },
   },
   {

@@ -12,7 +12,7 @@ export const FormSchema = z.object({
       invalid_type_error: "Amount must be a number.",
     })
     .min(1, "Please input an amount."),
-  title: z
+  purpose: z
     .string({ required_error: "Input what's the deal for." })
     .min(1, "Input what's the deal for."),
 });

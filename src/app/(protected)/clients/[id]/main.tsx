@@ -21,7 +21,7 @@ type Transaction = {
   created_at: string;
   customer_id: string;
   value: number;
-  title: string;
+  purpose: string;
   status: "pending" | "rejected" | "approved";
 };
 
@@ -65,14 +65,12 @@ const ClientInformation = ({ client }: { client: Client[] }) => {
                 <h2 className="flex items-center text-xl font-bold leading-none text-gray-900 dark:text-white sm:text-2xl my-2">
                   {client.name}
                 </h2>
-                <address className="text-primary font-semibold text-sm">
+                <address className="text-muted-foreground font-semibold text-sm">
                   {client.email}
                 </address>
               </div>
             </div>
-            <p className="text-accent-foreground max-w-sm font-medium">
-              {client.bio}
-            </p>
+            <p className="text-muted-foreground max-w-sm">{client.bio}</p>
           </div>
           <div className="space-y-4">
             <dl>
@@ -113,7 +111,7 @@ const ClientInformation = ({ client }: { client: Client[] }) => {
 const ClientTransaction = ({ transaction }: { transaction: Transaction[] }) => {
   return (
     <div className="mt-8 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800 md:p-8">
-      <h3 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
+      <h3 className="pb-4 text-xl font-semibold text-gray-900 dark:text-white border-b">
         Recent Transactions
       </h3>
       {transaction.map((t) => (
@@ -137,7 +135,7 @@ const ClientTransaction = ({ transaction }: { transaction: Transaction[] }) => {
               Purpose
             </dt>
             <dd className="mt-1.5 text-sm font-semibold text-gray-900 dark:text-white">
-              {t.title}
+              {t.purpose}
             </dd>
           </dl>
           <dl className="w-1/2 sm:w-1/4 md:flex-1 lg:w-auto">

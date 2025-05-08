@@ -14,7 +14,7 @@ const getClientTransactions = async () => {
 };
 
 export const useTransactions = () => {
-  const { data } = useSWR("transactions", getClientTransactions, {
+  const { data } = useSWR("metrics", getClientTransactions, {
     revalidateOnFocus: false,
   });
 

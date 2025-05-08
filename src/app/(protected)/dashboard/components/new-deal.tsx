@@ -22,7 +22,7 @@ import NewDealsForm from "@/app/(protected)/dashboard/components/new-deals-form"
 const defaultValues = {
   customer_id: "",
   value: 0,
-  title: "",
+  purpose: "",
 };
 
 const NewDeals = () => {

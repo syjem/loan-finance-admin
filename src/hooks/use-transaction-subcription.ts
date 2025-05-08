@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase/client";
 export const useTransactionSubscription = () => {
   const { mutate } = useSWRConfig();
 
-  useSWRSubscription("transactions", (key, { next }) => {
+  useSWRSubscription("metrics", (key, { next }) => {
     const channel = supabase
       .channel("deal-changes")
       .on(

@@ -6,7 +6,7 @@ const ProtectedRoutesLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset className="p-5">{children}</SidebarInset>
+      <SidebarInset className="p-5 dark:bg-slate-950">{children}</SidebarInset>
     </SidebarProvider>
   );
 };
