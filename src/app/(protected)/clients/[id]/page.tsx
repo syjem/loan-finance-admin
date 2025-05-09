@@ -12,10 +12,26 @@ import {
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
 import { Main } from "./main";
+import { Metadata } from "next";
 
 type ParamsType = {
   params: Promise<{ id: string }>;
 };
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { id: string };
+}): Promise<Metadata> {
+  const id = params.id;
+  const client = await getClientById(id);
+
+  return {
+    title: client
+      ? `Clients ~ ${client.map((client: Client) => client.name)}`
+      : "Client Not Found",
+  };
+}
 
 export type Client = {
   id: string;

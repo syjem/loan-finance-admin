@@ -124,7 +124,7 @@ const ClientTransaction = ({ transaction }: { transaction: Transaction[] }) => {
         >
           <dl className="w-1/2 sm:w-1/4 md:flex-1 lg:w-auto">
             <dt className="text-base font-medium text-gray-500 dark:text-gray-400">
-              Created at
+              Date
             </dt>
             <dd className="mt-1.5 text-sm font-semibold text-gray-900 dark:text-white">
               {formatDate(t.created_at)}

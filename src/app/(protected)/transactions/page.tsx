@@ -1,6 +1,11 @@
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import React from "react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Transactions",
+};
 
 const TransactionsPage = () => {
   return (

@@ -16,7 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { supabase } from "@/lib/supabase/client";
-import { FormSchema } from "@/lib/zod-schema";
+import { FormSchema } from "@/lib/schema";
 import NewDealsForm from "@/app/(protected)/dashboard/components/new-deals-form";
 
 const defaultValues = {
@@ -56,11 +56,12 @@ const NewDeals = () => {
       onOpenChange={setIsDialogOpen}
     >
       <DialogTrigger asChild>
-        <Button variant="link" className="cursor-pointer">
-          New Deals
-        </Button>
+        <Button className="cursor-pointer">New Deals</Button>
       </DialogTrigger>
-      <DialogContent id="new-deals-description" className="sm:max-w-[425px]">
+      <DialogContent
+        id="new-deals-description"
+        className="sm:max-w-[425px] bg-muted"
+      >
         <DialogHeader>
           <DialogTitle>Add New Deal</DialogTitle>
         </DialogHeader>

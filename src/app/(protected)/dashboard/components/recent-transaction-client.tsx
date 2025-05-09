@@ -10,7 +10,7 @@ type Transaction = {
   email: string;
   avatar: string;
   value: number;
-  title: string;
+  purpose: string;
 };
 
 const RecentTransactionsClient = ({
@@ -37,15 +37,12 @@ const RecentTransactionsClient = ({
                     {getInitials(item.name)}
                   </AvatarFallback>
                 </Avatar>
-                <div className="flex flex-col leading-5">
-                  <span className="font-semibold text-start">{item.name}</span>
-                  <span
-                    title={item.email}
-                    className="text-muted-foreground/60 truncate max-w-[180px]"
-                  >
-                    {item.email}
-                  </span>
-                </div>
+                <dl className="flex flex-col leading-5">
+                  <dt className="font-semibold text-start">{item.name}</dt>
+                  <dd title={item.email} className="text-muted-foreground/60">
+                    {`${item.purpose} loan`}
+                  </dd>
+                </dl>
               </div>
 
               <span className="font-semibold">

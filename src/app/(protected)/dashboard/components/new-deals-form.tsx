@@ -18,13 +18,28 @@ import {
 } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
-import { Loader2 } from "lucide-react";
+import { CreditCard, GraduationCap, Loader2, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useClientInfo } from "@/hooks/use-client-info";
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
-import { FormSchema } from "@/lib/zod-schema";
+import { FormSchema } from "@/lib/schema";
 import { getInitials } from "@/lib/utils";
+
+export const purpose = [
+  {
+    name: "Education",
+    icon: <GraduationCap />,
+  },
+  {
+    name: "Personal",
+    icon: <User />,
+  },
+  {
+    name: "Business",
+    icon: <CreditCard />,
+  },
+];
 
 type NewDealsFormProps = {
   form: UseFormReturn<z.infer<typeof FormSchema>>;
@@ -82,6 +97,39 @@ const NewDealsForm = ({ form, onSubmit }: NewDealsFormProps) => {
           />
           <FormField
             control={form.control}
+            name="purpose"
+            render={({ field }) => (
+              <FormItem className="flex flex-col justify-center gap-2">
+                <FormLabel htmlFor="purpose" className="text-right">
+                  Purpose:
+                </FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger id="purpose" className="col-span-3 w-full">
+                      <SelectValue placeholder="What's the deal for?" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectGroup>
+                      {purpose.map((p) => (
+                        <SelectItem key={p.name} value={p.name}>
+                          {p.icon}
+                          {p.name}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
             name="value"
             render={({ field }) => (
               <FormItem className="flex flex-col justify-center gap-2">
@@ -90,21 +138,6 @@ const NewDealsForm = ({ form, onSubmit }: NewDealsFormProps) => {
                 </FormLabel>
                 <FormControl>
                   <Input {...field} id="amount" className="col-span-3" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="purpose"
-            render={({ field }) => (
-              <FormItem className="flex flex-col justify-center gap-2">
-                <FormLabel htmlFor="purpose" className="text-right">
-                  Purpose:
-                </FormLabel>
-                <FormControl>
-                  <Input {...field} id="purpose" className="col-span-3" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
