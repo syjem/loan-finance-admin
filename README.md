@@ -1,4 +1,4 @@
-# "DealTrack" – A Lending Admin Dashboard
+# "Loan Finance Tracker" – A Lending Admin Dashboard
 
 A back-office tool for loan agents or finance admins to track:
 
