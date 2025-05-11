@@ -3,6 +3,7 @@ import { Users, LayoutDashboard, CreditCard } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -11,6 +12,8 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { NavUser } from "./nav-user";
+import { getCurrentUser } from "@/lib/supabase/session";
 
 // Menu items
 const items = [
@@ -31,7 +34,9 @@ const items = [
   },
 ];
 
-export function AppSidebar() {
+export async function AppSidebar() {
+  const user = await getCurrentUser();
+
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
@@ -53,6 +58,17 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        {user && (
+          <NavUser
+            user={{
+              name: user?.user_metadata.full_name,
+              email: user?.email ?? "",
+              avatar: user?.user_metadata.avatar_url,
+            }}
+          />
+        )}
+      </SidebarFooter>
     </Sidebar>
   );
 }
