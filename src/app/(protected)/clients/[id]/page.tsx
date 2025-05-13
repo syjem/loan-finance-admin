@@ -20,10 +20,8 @@ type ParamsType = {
 
 export async function generateMetadata({
   params,
-}: {
-  params: { id: string };
-}): Promise<Metadata> {
-  const id = params.id;
+}: ParamsType): Promise<Metadata> {
+  const id = (await params).id;
   const client = await getClientById(id);
 
   return {
