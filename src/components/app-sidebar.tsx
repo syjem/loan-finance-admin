@@ -1,4 +1,4 @@
-import { Users, LayoutDashboard, CreditCard } from "lucide-react";
+import { Users, TrendingUp, CreditCard } from "lucide-react";
 
 import {
   Sidebar,
@@ -6,7 +6,6 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -22,7 +21,7 @@ const items = [
   {
     title: "Dashboard",
     url: "/dashboard",
-    icon: LayoutDashboard,
+    icon: TrendingUp,
   },
   {
     title: "Clients",
@@ -30,8 +29,8 @@ const items = [
     icon: Users,
   },
   {
-    title: "Transactions",
-    url: "/transactions",
+    title: "Loan Application",
+    url: "/loan-application",
     icon: CreditCard,
   },
 ];
@@ -57,7 +56,6 @@ export async function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (

@@ -3,7 +3,7 @@
 import { supabase } from "@/lib/supabase/client";
 import useSWR from "swr";
 
-const getCleints = async () => {
+const getClients = async () => {
   const { data, error } = await supabase
     .from("customers")
     .select(`id, name, email, avatar`);
@@ -14,7 +14,7 @@ const getCleints = async () => {
 };
 
 export const useClientInfo = () => {
-  const { data } = useSWR("clients", getCleints, { revalidateOnFocus: false });
+  const { data } = useSWR("clients", getClients, { revalidateOnFocus: false });
 
   return {
     clients: data || [],

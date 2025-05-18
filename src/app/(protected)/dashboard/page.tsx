@@ -7,6 +7,15 @@ import RecentTransactionSkeleton from "@/components/fallback-ui/recent-transacti
 import RecentTransactionServer from "@/app/(protected)/dashboard/components/recent-transaction-server";
 import NewDeals from "@/app/(protected)/dashboard/components/new-deal";
 import { Metadata } from "next";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { MonthlyDealsChart } from "./components/monthly-deals-chart";
+import { DealStatusChart } from "./components/deals-status-chart";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -25,6 +34,30 @@ export default function Dashboard() {
       </header>
 
       <DashboardInfoCards />
+      <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+        <Card className="lg:col-span-4 bg-muted/50">
+          <CardHeader>
+            <CardTitle>Monthly Deals</CardTitle>
+            <CardDescription>
+              Number of new loan applications per month
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <MonthlyDealsChart />
+          </CardContent>
+        </Card>
+        <Card className="lg:col-span-3 bg-muted/50">
+          <CardHeader>
+            <CardTitle>Deal Status</CardTitle>
+            <CardDescription>
+              Distribution of loan applications by status
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <DealStatusChart />
+          </CardContent>
+        </Card>
+      </div>
       <div className="grid auto-rows-fr gap-4 md:grid-cols-3 items-stretch mt-4">
         <div className="shadow-md border rounded-xl bg-muted/50 col-span-1 md:col-span-2">
           <h3 className="my-4 mx-6 font-semibold text-lg text-slate-950 dark:text-slate-50 m-0">

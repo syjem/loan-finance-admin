@@ -2,6 +2,13 @@
 
 import { useEffect, useState } from "react";
 
+import { z } from "zod";
+import { FormSchema } from "@/lib/schema";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/supabase/client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import NewDealsForm from "@/app/(protected)/dashboard/components/new-deals-form";
 import {
   Dialog,
   DialogContent,
@@ -9,15 +16,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-
-import { Button } from "@/components/ui/button";
-
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { supabase } from "@/lib/supabase/client";
-import { FormSchema } from "@/lib/schema";
-import NewDealsForm from "@/app/(protected)/dashboard/components/new-deals-form";
 
 const defaultValues = {
   customer_id: "",
@@ -56,7 +54,7 @@ const NewDeals = () => {
       onOpenChange={setIsDialogOpen}
     >
       <DialogTrigger asChild>
-        <Button className="cursor-pointer">New Deals</Button>
+        <Button className="cursor-pointer">New Application</Button>
       </DialogTrigger>
       <DialogContent
         id="new-deals-description"

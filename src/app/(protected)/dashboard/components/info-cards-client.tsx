@@ -1,6 +1,6 @@
 "use client";
 
-import { DollarSign, CreditCard, Users } from "lucide-react";
+import { DollarSign, FileText, Users, TrendingUp } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTransactionStats } from "@/hooks/subscriptions/use-transaction-stats";
@@ -8,7 +8,8 @@ import { useTransactionStats } from "@/hooks/subscriptions/use-transaction-stats
 const iconType = {
   totalValue: DollarSign,
   clients: Users,
-  transactions: CreditCard,
+  deals: FileText,
+  approvalRate: TrendingUp,
 };
 
 type Props = {
@@ -26,17 +27,30 @@ export const DashboardInfoCardsClient = ({
   const { data: stats = initialStats } = useTransactionStats();
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      <CustomCard title="Clients" value={numberOfCustomers} type="clients" />
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <CustomCard
-        title="Transactions"
-        value={stats.totalTransactions}
-        type="transactions"
-      />
-      <CustomCard
-        title="Total Value"
+        title="Total Loan Value"
         value={stats.transactionsTotalValue}
         type="totalValue"
+        description="+20.1% from last month"
+      />
+      <CustomCard
+        title="Number of Clients"
+        value={numberOfCustomers}
+        type="clients"
+        description="+12 new clients this month"
+      />
+      <CustomCard
+        title="New Deals This Month"
+        value={stats.totalTransactions}
+        type="deals"
+        description="+5.2% from last month"
+      />
+      <CustomCard
+        title="Approval Rate"
+        value={78.5}
+        type="approvalRate"
+        description="+2.1% from last month"
       />
     </div>
   );
@@ -45,22 +59,27 @@ export const DashboardInfoCardsClient = ({
 type CardProps = {
   title: string;
   value: number | null;
-  type: "transactions" | "clients" | "totalValue";
+  type: "deals" | "clients" | "totalValue" | "approvalRate";
+  description: string;
 };
 
-const CustomCard = ({ title, value, type }: CardProps) => {
+const CustomCard = ({ title, value, type, description }: CardProps) => {
   const Icon = iconType[type];
 
   return (
-    <Card className="bg-muted/50">
+    <Card className="bg-muted/50 gap-3">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        {Icon && <Icon className="h-5 w-5 text-slate-700 dark:text-gray-500" />}
+        {Icon && <Icon className="h-5 w-5 text-muted-foreground" />}
       </CardHeader>
-      <CardContent className="text-base md:text-xl font-bold">
-        {type === "totalValue" && value !== null
-          ? formatCurrency(value)
-          : value}
+      <CardContent className="space-y-2">
+        <div className="text-base md:text-xl font-bold">
+          {type === "totalValue" && value !== null
+            ? formatCurrency(value)
+            : value}
+          {type === "approvalRate" && `%`}
+        </div>
+        <p className="text-xs text-muted-foreground">{description}</p>
       </CardContent>
     </Card>
   );
