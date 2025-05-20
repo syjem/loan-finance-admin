@@ -2,7 +2,7 @@
 
 import { toast } from "sonner";
 import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { cn, getInitials } from "@/lib/utils";
 import { format } from "date-fns";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
@@ -44,63 +44,15 @@ import {
   CommandInput,
   CommandItem,
 } from "@/components/ui/command";
-import { FormValues } from "@/lib/types";
+import type { ClientInformation, FormValues } from "@/lib/types";
 import { formSchema } from "@/lib/schema";
-
-// Sample clients data
-const clients = [
-  { value: "1", label: "Alex Johnson" },
-  { value: "2", label: "Sarah Williams" },
-  { value: "3", label: "Michael Brown" },
-  { value: "4", label: "Emily Davis" },
-  { value: "5", label: "Robert Wilson" },
-  { value: "6", label: "Jessica Martinez" },
-  { value: "7", label: "David Kim" },
-  { value: "8", label: "Amanda Taylor" },
-  { value: "9", label: "Thomas Wright" },
-  { value: "10", label: "Robert Chen" },
-];
-
-// Form steps
-const steps = [
-  {
-    id: "step-1",
-    name: "Borrower Information",
-    fields: [
-      "clientId",
-      "firstName",
-      "lastName",
-      "email",
-      "phone",
-      "companyName",
-    ],
-  },
-  {
-    id: "step-2",
-    name: "Loan Details",
-    fields: [
-      "loanAmount",
-      "loanPurpose",
-      "loanTerm",
-      "interestRate",
-      "startDate",
-    ],
-  },
-  {
-    id: "step-3",
-    name: "Additional Information",
-    fields: ["creditScore", "annualIncome", "collateral", "additionalNotes"],
-  },
-  {
-    id: "step-4",
-    name: "Review",
-    fields: [],
-  },
-];
+import { getClientById, useClient } from "@/hooks/use-client-info";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { STEPS as steps } from "@/lib/constants";
 
 export function LoanApplicationForm() {
   const router = useRouter();
-  const [previousStep, setPreviousStep] = useState(0);
+  const { clients } = useClient();
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [clientOpen, setClientOpen] = useState(false);
@@ -112,55 +64,34 @@ export function LoanApplicationForm() {
       lastName: "",
       email: "",
       phone: "",
-      companyName: "",
+      startDate: new Date(),
       loanAmount: "",
-      interestRate: "",
-      creditScore: "",
-      annualIncome: "",
-      collateral: "",
+      interestRate: "3.5",
       additionalNotes: "",
     },
   });
 
-  // Watch for client selection to auto-fill form
-  const selectedClientId = form.watch("clientId");
-
   // Auto-fill form when client is selected
-  const handleClientSelect = (clientId: string) => {
-    // In a real app, you would fetch client details from API
-    // For demo, we'll use mock data
-    const clientData: Record<string, any> = {
-      "1": {
-        firstName: "Alex",
-        lastName: "Johnson",
-        email: "alex@johnson.com",
-        phone: "1234567890",
-        companyName: "Johnson Enterprises",
-      },
-      "2": {
-        firstName: "Sarah",
-        lastName: "Williams",
-        email: "sarah@williams.com",
-        phone: "2345678901",
-        companyName: "Williams Group",
-      },
-      // Add more client data as needed
-    };
+  const handleClientSelect = async (clientId: string) => {
+    try {
+      const selectedClient = await getClientById(clientId);
+      const client = selectedClient[0];
 
-    if (clientData[clientId]) {
-      const data = clientData[clientId];
-      form.setValue("firstName", data.firstName);
-      form.setValue("lastName", data.lastName);
-      form.setValue("email", data.email);
-      form.setValue("phone", data.phone);
-      form.setValue("companyName", data.companyName || "");
+      if (client) {
+        form.setValue("firstName", client.firstName);
+        form.setValue("lastName", client.lastName);
+        form.setValue("email", client.email);
+        form.setValue("phone", client.phoneNumber);
+      }
+    } catch (error) {
+      console.error("Failed to fetch client info:", error);
     }
   };
 
   // Check if fields in the current step are valid
   const validateStep = async () => {
-    const fields = steps[currentStep].fields;
-    const output = await form.trigger(fields as any, { shouldFocus: true });
+    const fields = steps[currentStep].fields as (keyof FormValues)[];
+    const output = await form.trigger(fields, { shouldFocus: true });
     return output;
   };
 
@@ -170,7 +101,6 @@ export function LoanApplicationForm() {
     if (!isValid) return;
 
     if (currentStep < steps.length - 1) {
-      setPreviousStep(currentStep);
       setCurrentStep(currentStep + 1);
     }
   };
@@ -178,7 +108,6 @@ export function LoanApplicationForm() {
   // Go to the previous step
   const prevStep = () => {
     if (currentStep > 0) {
-      setPreviousStep(currentStep);
       setCurrentStep(currentStep - 1);
     }
   };
@@ -188,9 +117,7 @@ export function LoanApplicationForm() {
     setIsSubmitting(true);
 
     try {
-      const serverData = await createLoanApplication(data);
-      console.log(serverData);
-
+      await createLoanApplication(data);
       router.push("/loan-application");
       toast("Success!", {
         description: "The loan application has been submitted successfully.",
@@ -203,7 +130,7 @@ export function LoanApplicationForm() {
   };
 
   return (
-    <Card>
+    <Card className="bg-muted/50">
       <CardContent className="p-6">
         {/* Form progress */}
         <div className="mb-8">
@@ -249,9 +176,8 @@ export function LoanApplicationForm() {
           </div>
         </div>
 
-        {/* Form */}
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form className="space-y-6">
             {/* Step 1: Borrower Information */}
             {currentStep === 0 && (
               <div className="space-y-4">
@@ -259,6 +185,7 @@ export function LoanApplicationForm() {
                   Borrower Information
                 </div>
 
+                {/* Select Existing Client */}
                 <FormField
                   control={form.control}
                   name="clientId"
@@ -274,42 +201,66 @@ export function LoanApplicationForm() {
                               aria-expanded={clientOpen}
                               className="justify-between"
                             >
-                              {field.value
-                                ? clients.find(
-                                    (client) => client.value === field.value
-                                  )?.label
-                                : "Search clients..."}
+                              {(() => {
+                                const selectedClient = clients.find(
+                                  (client) => client.id === field.value
+                                );
+
+                                return selectedClient ? (
+                                  <span className="flex items-center gap-2">
+                                    <Avatar className="size-6">
+                                      <AvatarImage
+                                        src={selectedClient.avatar}
+                                        alt={`${selectedClient.firstName} ${selectedClient.lastName}`}
+                                      />
+                                      <AvatarFallback>
+                                        {getInitials(
+                                          `${selectedClient.firstName} ${selectedClient.lastName}`
+                                        )}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    {selectedClient.firstName}{" "}
+                                    {selectedClient.lastName}
+                                  </span>
+                                ) : (
+                                  "Search clients..."
+                                );
+                              })()}
                               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
                           </FormControl>
                         </PopoverTrigger>
+
                         <PopoverContent className="p-0">
                           <Command>
                             <CommandInput placeholder="Search clients..." />
                             <CommandList>
                               <CommandEmpty>No client found.</CommandEmpty>
                               <CommandGroup>
-                                {clients.map((client) => (
-                                  <CommandItem
-                                    key={client.value}
-                                    value={client.value}
-                                    onSelect={(value) => {
-                                      field.onChange(value);
-                                      handleClientSelect(value);
-                                      setClientOpen(false);
-                                    }}
-                                  >
-                                    <Check
-                                      className={cn(
-                                        "mr-2 h-4 w-4",
-                                        client.value === field.value
-                                          ? "opacity-100"
-                                          : "opacity-0"
-                                      )}
-                                    />
-                                    {client.label}
-                                  </CommandItem>
-                                ))}
+                                {clients.map((client: ClientInformation) => {
+                                  const fullName = `${client.firstName} ${client.lastName}`;
+                                  return (
+                                    <CommandItem
+                                      key={client.id}
+                                      value={fullName.toLowerCase()}
+                                      onSelect={() => {
+                                        field.onChange(client.id);
+                                        handleClientSelect(client.id);
+                                        setClientOpen(false);
+                                      }}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          client.id === field.value
+                                            ? "opacity-100"
+                                            : "opacity-0"
+                                        )}
+                                      />
+                                      {fullName}
+                                    </CommandItem>
+                                  );
+                                })}
                               </CommandGroup>
                             </CommandList>
                           </Command>
@@ -386,27 +337,113 @@ export function LoanApplicationForm() {
                     )}
                   />
                 </div>
-
-                <FormField
-                  control={form.control}
-                  name="companyName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Company Name (Optional)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Acme Inc." {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
               </div>
             )}
 
             {/* Step 2: Loan Details */}
             {currentStep === 1 && (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div className="text-xl font-semibold">Loan Details</div>
+
+                <div className="grid gap-4 md:grid-cols-3">
+                  <FormField
+                    control={form.control}
+                    name="loanPurpose"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Loan Purpose</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Select purpose" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="business">Business</SelectItem>
+                            <SelectItem value="personal">Personal</SelectItem>
+                            <SelectItem value="educational">
+                              Educational
+                            </SelectItem>
+                            <SelectItem value="medical">Medical</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="loanTerm"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Loan Term</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Select term" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="15_days">15 Days</SelectItem>
+                            <SelectItem value="1_month">1 Month</SelectItem>
+                            <SelectItem value="2_months">2 Months</SelectItem>
+                            <SelectItem value="3_months">3 Months</SelectItem>
+                            <SelectItem value="6_months">6 Months</SelectItem>
+                            <SelectItem value="1_year">1 Year</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="startDate"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Start Date</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant={"outline"}
+                                className={cn(
+                                  "w-full pl-3 text-left font-normal",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                              >
+                                {field.value ? (
+                                  format(field.value, "PPP")
+                                ) : (
+                                  <span>Pick a date</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 <div className="grid gap-4 md:grid-cols-2">
                   <FormField
@@ -438,173 +475,6 @@ export function LoanApplicationForm() {
                   />
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-2">
-                  <FormField
-                    control={form.control}
-                    name="loanPurpose"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Loan Purpose</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select purpose" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="business_expansion">
-                              Business Expansion
-                            </SelectItem>
-                            <SelectItem value="property_purchase">
-                              Property Purchase
-                            </SelectItem>
-                            <SelectItem value="equipment_financing">
-                              Equipment Financing
-                            </SelectItem>
-                            <SelectItem value="debt_consolidation">
-                              Debt Consolidation
-                            </SelectItem>
-                            <SelectItem value="working_capital">
-                              Working Capital
-                            </SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="loanTerm"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Loan Term</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select term" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="6_months">6 Months</SelectItem>
-                            <SelectItem value="1_year">1 Year</SelectItem>
-                            <SelectItem value="2_years">2 Years</SelectItem>
-                            <SelectItem value="3_years">3 Years</SelectItem>
-                            <SelectItem value="5_years">5 Years</SelectItem>
-                            <SelectItem value="10_years">10 Years</SelectItem>
-                            <SelectItem value="15_years">15 Years</SelectItem>
-                            <SelectItem value="30_years">30 Years</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="startDate"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Start Date</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>Pick a date</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            )}
-
-            {/* Step 3: Additional Information */}
-            {currentStep === 2 && (
-              <div className="space-y-4">
-                <div className="text-xl font-semibold">
-                  Additional Information
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <FormField
-                    control={form.control}
-                    name="creditScore"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Credit Score (Optional)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="720" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="annualIncome"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Annual Income ($) (Optional)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="75000" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="collateral"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Collateral (Optional)</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Property, vehicle, etc."
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
                 <FormField
                   control={form.control}
                   name="additionalNotes"
@@ -625,8 +495,8 @@ export function LoanApplicationForm() {
               </div>
             )}
 
-            {/* Step 4: Review */}
-            {currentStep === 3 && (
+            {/* Step 3: Review */}
+            {currentStep === 2 && (
               <div className="space-y-6">
                 <div className="text-xl font-semibold">Review Application</div>
 
@@ -643,20 +513,14 @@ export function LoanApplicationForm() {
                       </div>
                       <div className="grid grid-cols-2">
                         <span className="text-muted-foreground">Email:</span>
-                        <span>{form.getValues("email")}</span>
+                        <span className="truncate overflow-hidden whitespace-nowrap max-w-[140px] sm:max-w-full">
+                          {form.getValues("email")}
+                        </span>
                       </div>
                       <div className="grid grid-cols-2">
                         <span className="text-muted-foreground">Phone:</span>
                         <span>{form.getValues("phone")}</span>
                       </div>
-                      {form.getValues("companyName") && (
-                        <div className="grid grid-cols-2">
-                          <span className="text-muted-foreground">
-                            Company:
-                          </span>
-                          <span>{form.getValues("companyName")}</span>
-                        </div>
-                      )}
                     </div>
                   </div>
 
@@ -707,30 +571,6 @@ export function LoanApplicationForm() {
                   <div>
                     <h3 className="font-medium">Additional Information</h3>
                     <div className="mt-2 grid gap-2 text-sm">
-                      {form.getValues("creditScore") && (
-                        <div className="grid grid-cols-2">
-                          <span className="text-muted-foreground">
-                            Credit Score:
-                          </span>
-                          <span>{form.getValues("creditScore")}</span>
-                        </div>
-                      )}
-                      {form.getValues("annualIncome") && (
-                        <div className="grid grid-cols-2">
-                          <span className="text-muted-foreground">
-                            Annual Income:
-                          </span>
-                          <span>${form.getValues("annualIncome")}</span>
-                        </div>
-                      )}
-                      {form.getValues("collateral") && (
-                        <div className="grid grid-cols-2">
-                          <span className="text-muted-foreground">
-                            Collateral:
-                          </span>
-                          <span>{form.getValues("collateral")}</span>
-                        </div>
-                      )}
                       {form.getValues("additionalNotes") && (
                         <div className="grid grid-cols-1 gap-1">
                           <span className="text-muted-foreground">Notes:</span>
@@ -757,7 +597,11 @@ export function LoanApplicationForm() {
               </Button>
 
               {currentStep === steps.length - 1 ? (
-                <Button type="submit" disabled={isSubmitting}>
+                <Button
+                  type="button"
+                  onClick={form.handleSubmit(onSubmit)}
+                  disabled={isSubmitting}
+                >
                   {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />

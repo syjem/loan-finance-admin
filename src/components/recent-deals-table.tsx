@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 const recentDeals = [
   {
@@ -26,7 +27,7 @@ const recentDeals = [
     amount: "$320,000",
     purpose: "Property Purchase",
     date: new Date("2023-05-08"),
-    status: "Under Review",
+    status: "Pending",
   },
   {
     id: "LOAN-7892",
@@ -84,15 +85,14 @@ export function RecentDealsTable() {
             </TableCell>
             <TableCell>
               <Badge
-                variant={
-                  deal.status === "Approved"
-                    ? "default"
-                    : deal.status === "Pending"
-                    ? "secondary"
-                    : deal.status === "Under Review"
-                    ? "outline"
-                    : "destructive"
-                }
+                className={cn(
+                  "text-xs",
+                  deal.status === "Approved" &&
+                    "bg-green-800/50 text-green-300",
+                  deal.status === "Pending" &&
+                    "bg-yellow-700/50 text-yellow-300",
+                  deal.status === "Rejected" && "bg-red-800/50 text-red-300"
+                )}
               >
                 {deal.status}
               </Badge>

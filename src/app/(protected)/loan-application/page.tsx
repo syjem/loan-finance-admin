@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Plus } from "lucide-react";
 import type { Metadata } from "next";
 import { Button } from "@/components/ui/button";
 import { RecentDealsTable } from "@/components/recent-deals-table";
@@ -27,14 +26,11 @@ export default function DealsPage() {
           </p>
         </div>
         <Button asChild>
-          <Link href="/loan-application/new">
-            <Plus className="h-4 w-4" />
-            New Application
-          </Link>
+          <Link href="/loan-application/new">New Application</Link>
         </Button>
       </div>
 
-      <Card>
+      <Card className="bg-muted/50">
         <CardHeader>
           <CardTitle>Recent Applications</CardTitle>
           <CardDescription>

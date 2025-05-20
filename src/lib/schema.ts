@@ -19,9 +19,7 @@ export const FormSchema = z.object({
 
 export const formSchema = z.object({
   // Step 1: Borrower Information
-  clientId: z.string({
-    required_error: "Please select a client",
-  }),
+  clientId: z.string().optional(),
   firstName: z.string().min(2, {
     message: "First name must be at least 2 characters.",
   }),
@@ -34,7 +32,6 @@ export const formSchema = z.object({
   phone: z.string().min(10, {
     message: "Phone number must be at least 10 digits.",
   }),
-  companyName: z.string().optional(),
 
   // Step 2: Loan Details
   loanAmount: z.string().min(1, {
@@ -52,10 +49,5 @@ export const formSchema = z.object({
   startDate: z.date({
     required_error: "Start date is required.",
   }),
-
-  // Step 3: Additional Information
-  creditScore: z.string().optional(),
-  annualIncome: z.string().optional(),
-  collateral: z.string().optional(),
   additionalNotes: z.string().optional(),
 });

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function NewLoanApplicationPage() {
   return (
-    <div className="container max-w-4xl py-6">
+    <div className="container max-w-3xl py-6">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">New Loan Application</h1>
         <p className="text-muted-foreground">
