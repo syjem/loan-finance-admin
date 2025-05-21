@@ -29,3 +29,20 @@ export const STEPS = [
     fields: [],
   },
 ];
+
+export const LOANPURPOSES = [
+  "business",
+  "personal",
+  "educational",
+  "medical",
+  "others",
+];
+
+export const LOANTERMS = [
+  "15 days",
+  "1 month",
+  "2 months",
+  "3 months",
+  "6 months",
+  "1 year",
+];

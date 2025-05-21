@@ -2,10 +2,10 @@
 
 import { toast } from "sonner";
 import { useState } from "react";
-import { cn, getInitials } from "@/lib/utils";
 import { format } from "date-fns";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import { cn, getInitials } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createLoanApplication } from "@/app/actions";
 import { CalendarIcon, Check, ChevronsUpDown, Loader2 } from "lucide-react";
@@ -45,30 +45,27 @@ import {
   CommandItem,
 } from "@/components/ui/command";
 import type { ClientInformation, FormValues } from "@/lib/types";
-import { formSchema } from "@/lib/schema";
+import {
+  loanApplicationFormDefaultValues as defaultValues,
+  loanApplicationFormSchema as formSchema,
+} from "@/lib/schema";
 import { getClientById, useClient } from "@/hooks/use-client-info";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { STEPS as steps } from "@/lib/constants";
+import {
+  STEPS as steps,
+  LOANPURPOSES as purposes,
+  LOANTERMS as terms,
+} from "@/lib/constants";
 
 export function LoanApplicationForm() {
   const router = useRouter();
   const { clients } = useClient();
   const [currentStep, setCurrentStep] = useState(0);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [clientOpen, setClientOpen] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      phone: "",
-      startDate: new Date(),
-      loanAmount: "",
-      interestRate: "3.5",
-      additionalNotes: "",
-    },
+    defaultValues,
   });
 
   // Auto-fill form when client is selected
@@ -82,6 +79,7 @@ export function LoanApplicationForm() {
         form.setValue("lastName", client.lastName);
         form.setValue("email", client.email);
         form.setValue("phone", client.phoneNumber);
+        form.setValue("companyName", client.companyName || "");
       }
     } catch (error) {
       console.error("Failed to fetch client info:", error);
@@ -114,18 +112,30 @@ export function LoanApplicationForm() {
 
   // Handle form submission
   const onSubmit = async (data: FormValues) => {
-    setIsSubmitting(true);
-
     try {
-      await createLoanApplication(data);
+      const result = await createLoanApplication(data);
+
+      if (!result.success) {
+        toast.error("Submission failed", {
+          description:
+            result.message ||
+            "An error occurred while submitting the loan application.",
+        });
+        return; // ⛔ Stop here if there's an error
+      }
+
+      // ✅ Success
       router.push("/loan-application");
-      toast("Success!", {
-        description: "The loan application has been submitted successfully.",
+      toast.success("Success!", {
+        description:
+          result.message ||
+          "The loan application has been submitted successfully.",
       });
     } catch (error) {
-      console.error("Error submitting form:", error);
-    } finally {
-      setIsSubmitting(false);
+      console.error("Unexpected error submitting form:", error);
+      toast.error("Unexpected Error", {
+        description: "Something went wrong. Please try again later.",
+      });
     }
   };
 
@@ -337,6 +347,20 @@ export function LoanApplicationForm() {
                     )}
                   />
                 </div>
+
+                <FormField
+                  control={form.control}
+                  name="companyName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Company Name (Optional)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Meta Inc." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
             )}
 
@@ -357,18 +381,20 @@ export function LoanApplicationForm() {
                           defaultValue={field.value}
                         >
                           <FormControl>
-                            <SelectTrigger className="w-full">
+                            <SelectTrigger className="w-full capitalize">
                               <SelectValue placeholder="Select purpose" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="business">Business</SelectItem>
-                            <SelectItem value="personal">Personal</SelectItem>
-                            <SelectItem value="educational">
-                              Educational
-                            </SelectItem>
-                            <SelectItem value="medical">Medical</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
+                            {purposes.map((p) => (
+                              <SelectItem
+                                key={p}
+                                value={p}
+                                className="capitalize"
+                              >
+                                {p}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -387,17 +413,20 @@ export function LoanApplicationForm() {
                           defaultValue={field.value}
                         >
                           <FormControl>
-                            <SelectTrigger className="w-full">
+                            <SelectTrigger className="w-full capitalize">
                               <SelectValue placeholder="Select term" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="15_days">15 Days</SelectItem>
-                            <SelectItem value="1_month">1 Month</SelectItem>
-                            <SelectItem value="2_months">2 Months</SelectItem>
-                            <SelectItem value="3_months">3 Months</SelectItem>
-                            <SelectItem value="6_months">6 Months</SelectItem>
-                            <SelectItem value="1_year">1 Year</SelectItem>
+                            {terms.map((t) => (
+                              <SelectItem
+                                key={t}
+                                value={t}
+                                className="capitalize"
+                              >
+                                {t}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -534,20 +563,12 @@ export function LoanApplicationForm() {
                       <div className="grid grid-cols-2">
                         <span className="text-muted-foreground">Purpose:</span>
                         <span>
-                          {form
-                            .getValues("loanPurpose")
-                            ?.replace(/_/g, " ")
-                            .replace(/\b\w/g, (l) => l.toUpperCase())}
+                          {form.getValues("loanPurpose")?.toUpperCase()}
                         </span>
                       </div>
                       <div className="grid grid-cols-2">
                         <span className="text-muted-foreground">Term:</span>
-                        <span>
-                          {form
-                            .getValues("loanTerm")
-                            ?.replace(/_/g, " ")
-                            .replace(/\b\w/g, (l) => l.toUpperCase())}
-                        </span>
+                        <span>{form.getValues("loanTerm")?.toUpperCase()}</span>
                       </div>
                       <div className="grid grid-cols-2">
                         <span className="text-muted-foreground">
@@ -587,22 +608,32 @@ export function LoanApplicationForm() {
 
             {/* Navigation buttons */}
             <div className="flex justify-between pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={prevStep}
-                disabled={currentStep === 0}
-              >
-                Previous
-              </Button>
+              {currentStep === 0 ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => router.back()}
+                >
+                  Cancel
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={prevStep}
+                  disabled={currentStep === 0}
+                >
+                  Previous
+                </Button>
+              )}
 
               {currentStep === steps.length - 1 ? (
                 <Button
                   type="button"
                   onClick={form.handleSubmit(onSubmit)}
-                  disabled={isSubmitting}
+                  disabled={form.formState.isSubmitting}
                 >
-                  {isSubmitting ? (
+                  {form.formState.isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Submitting...

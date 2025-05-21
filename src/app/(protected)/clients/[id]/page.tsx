@@ -68,8 +68,6 @@ const clients = [
     totalAmount: "$450,000",
     lastActivity: "2023-05-10",
     initials: "AJ",
-    creditScore: 780,
-    relationshipManager: "Sarah Thompson",
     joinDate: "2021-03-15",
   },
   {
@@ -85,8 +83,6 @@ const clients = [
     totalAmount: "$380,000",
     lastActivity: "2023-05-08",
     initials: "SW",
-    creditScore: 760,
-    relationshipManager: "Michael Chen",
     joinDate: "2021-06-22",
   },
   // Add more clients as needed
@@ -232,16 +228,6 @@ const ClientProfilePage = async ({ params }: ParamsType) => {
                     Additional Details
                   </div>
                   <div className="grid grid-cols-2 gap-2">
-                    <div className="text-sm">Credit Score</div>
-                    <div className="text-sm font-medium">
-                      {client.creditScore}
-                    </div>
-
-                    <div className="text-sm">Relationship Manager</div>
-                    <div className="text-sm font-medium">
-                      {client.relationshipManager}
-                    </div>
-
                     <div className="text-sm">Client Since</div>
                     <div className="text-sm font-medium">
                       {new Date(client.joinDate).toLocaleDateString()}

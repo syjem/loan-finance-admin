@@ -3,7 +3,7 @@
 import { DollarSign, FileText, Users, TrendingUp } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useTransactionStats } from "@/hooks/subscriptions/use-transaction-stats";
+import { useLoanStats } from "@/hooks/subscriptions/use-transaction-stats";
 
 const iconType = {
   totalValue: DollarSign,
@@ -13,18 +13,15 @@ const iconType = {
 };
 
 type Props = {
-  numberOfCustomers: number;
+  numberOfClients: number;
   initialStats: {
     totalTransactions: number;
     transactionsTotalValue: number;
   };
 };
 
-export const DashboardInfoCardsClient = ({
-  numberOfCustomers,
-  initialStats,
-}: Props) => {
-  const { data: stats = initialStats } = useTransactionStats();
+const OverviewCards = ({ numberOfClients, initialStats }: Props) => {
+  const { data: stats = initialStats } = useLoanStats();
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -36,7 +33,7 @@ export const DashboardInfoCardsClient = ({
       />
       <CustomCard
         title="Number of Clients"
-        value={numberOfCustomers}
+        value={numberOfClients}
         type="clients"
         description="+12 new clients this month"
       />
@@ -55,6 +52,8 @@ export const DashboardInfoCardsClient = ({
     </div>
   );
 };
+
+export default OverviewCards;
 
 type CardProps = {
   title: string;

@@ -8,11 +8,10 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { useTransactions } from "@/hooks/use-transaction";
-import { useTransactionSubscription } from "@/hooks/use-transaction-subcription";
+import { useClientsTotalValue } from "@/hooks/subscriptions/use-clients-total-value";
 
-type Metric = {
-  name: string;
+type BarChartType = {
+  firstName: string;
   total_value: number;
 };
 
@@ -23,14 +22,17 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-const TransactionChart = () => {
-  useTransactionSubscription(); // subscription
-  const { transaction } = useTransactions();
+const ClientsOverviewChart = ({
+  clientsTotalValue,
+}: {
+  clientsTotalValue: BarChartType[] | null;
+}) => {
+  const { data = clientsTotalValue } = useClientsTotalValue();
 
-  const chartData = transaction
-    .sort((a, b) => a.total_value - b.total_value)
-    .map((item: Metric) => ({
-      name: item.name,
+  const chartData = data
+    ?.sort((a, b) => a.total_value - b.total_value)
+    ?.map((item: BarChartType) => ({
+      name: item.firstName,
       value: item.total_value,
     }));
 
@@ -57,4 +59,4 @@ const TransactionChart = () => {
   );
 };
 
-export default TransactionChart;
+export default ClientsOverviewChart;

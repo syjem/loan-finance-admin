@@ -1,24 +1,27 @@
 "use client";
 
-import { useSWRConfig } from "swr";
+import useSWR from "swr";
 import useSWRSubscription from "swr/subscription";
 import { supabase } from "@/lib/supabase/client";
+import { getClientsTotalValue } from "@/app/data";
 
-export const useTransactionSubscription = () => {
-  const { mutate } = useSWRConfig();
+export const key = "clients_total_value";
 
-  useSWRSubscription("metrics", (key, { next }) => {
+export const useClientsTotalValue = () => {
+  const swr = useSWR(key, getClientsTotalValue, { revalidateOnFocus: false });
+
+  useSWRSubscription(key, (key, { next }) => {
     const channel = supabase
-      .channel("deal-changes")
+      .channel("realtime-clients-total-value")
       .on(
         "postgres_changes",
         {
           event: "*",
           schema: "public",
-          table: "transactions",
+          table: "loans",
         },
         (payload) => {
-          mutate(key);
+          swr.mutate();
           next(null, payload.new);
         }
       )
@@ -28,4 +31,6 @@ export const useTransactionSubscription = () => {
       supabase.removeChannel(channel);
     };
   });
+
+  return swr;
 };

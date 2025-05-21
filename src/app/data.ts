@@ -1,31 +1,31 @@
 "use server";
 
 import { createClientCheck } from "@/lib/supabase/create-client-check";
+import { createClient } from "@/lib/supabase/server";
 
-export const getTotalCustomers = async () => {
-  const result = await createClientCheck(async (supabase) => {
-    const { count, error } = await supabase
-      .from("customers")
-      .select("*", { count: "exact", head: true });
+export const getTotalClients = async () => {
+  const supabase = await createClient();
+  const { count, error } = await supabase
+    .from("clients")
+    .select("*", { count: "exact", head: true });
 
-    if (error) throw new Error(error.message);
+  if (error) {
+    return 0;
+  }
 
-    return count ?? 0;
-  });
-
-  return result ?? 0;
+  return count ?? 0;
 };
 
-export const getTransactionStats = async () => {
+export const getLoanStats = async () => {
   const result = await createClientCheck(async (supabase) => {
     const { count: totalTransactions } = await supabase
-      .from("transactions")
+      .from("loans")
       .select("*", { count: "exact", head: true });
 
-    const { data } = await supabase.from("transactions").select("value");
+    const { data } = await supabase.from("loans").select("amount");
 
     const transactionsTotalValue = data
-      ? data.reduce((acc, tx) => acc + tx.value, 0)
+      ? data.reduce((acc, tx) => acc + tx.amount, 0)
       : 0;
 
     return {
@@ -38,23 +38,22 @@ export const getTransactionStats = async () => {
 };
 
 export const getClientsTotalValue = async () => {
-  const result = await createClientCheck(async (supabase) => {
-    const { data } = await supabase.from("customer_total_value").select("*");
+  const supabase = await createClient();
+  const { data } = await supabase.from("clients_total_value").select("*");
 
-    return data;
-  });
-
-  return result;
+  return data;
 };
 
-export const getRecentTransactions = async () => {
+export const getRecentLoanApplications = async () => {
   const result = await createClientCheck(async (supabase) => {
-    const { data } = await supabase.from("recent_transactions").select("*");
+    const { data } = await supabase
+      .from("recent_loan_applications")
+      .select("*");
 
     return data;
   });
 
-  return result;
+  return result ?? [];
 };
 
 export const getClientById = async (id: string) => {

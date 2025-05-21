@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Button } from "@/components/ui/button";
-import { RecentDealsTable } from "@/components/recent-deals-table";
+import RecentApplicationTable from "@/components/recent-applications-table";
 import {
   Card,
   CardContent,
@@ -9,13 +9,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getRecentLoanApplications } from "@/app/data";
 
 export const metadata: Metadata = {
   title: "Loan Applications",
   description: "Manage loan applications",
 };
 
-export default function DealsPage() {
+export default async function DealsPage() {
+  const [recentLoanApplications] = await Promise.all([
+    getRecentLoanApplications(),
+  ]);
   return (
     <div className="container py-6">
       <div className="mb-8 flex items-center justify-between">
@@ -33,12 +37,12 @@ export default function DealsPage() {
       <Card className="bg-muted/50">
         <CardHeader>
           <CardTitle>Recent Applications</CardTitle>
-          <CardDescription>
-            View and manage recent loan applications
-          </CardDescription>
+          <CardDescription>View recent loan applications</CardDescription>
         </CardHeader>
         <CardContent>
-          <RecentDealsTable />
+          <RecentApplicationTable
+            recentLoanApplications={recentLoanApplications}
+          />
         </CardContent>
       </Card>
     </div>
