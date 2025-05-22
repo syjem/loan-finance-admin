@@ -10,6 +10,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getRecentLoanApplications } from "@/app/data";
+import { Separator } from "@/components/ui/separator";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 export const metadata: Metadata = {
   title: "Loan Applications",
@@ -21,18 +23,19 @@ export default async function DealsPage() {
     getRecentLoanApplications(),
   ]);
   return (
-    <div className="container py-6">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Loan Applications</h1>
-          <p className="text-muted-foreground">
-            Manage and track all loan applications
-          </p>
+    <div className="container space-y-6">
+      <header className="flex items-center justify-between">
+        <div className="flex items-center gap-2 h-4 shrink-0">
+          <SidebarTrigger className="-ml-1" />
+          <Separator orientation="vertical" className="h-2 -ml-1 border" />
+          <h1 className="text-base font-medium tracking-tight">
+            Loan Applications
+          </h1>
         </div>
         <Button asChild>
-          <Link href="/loan-application/new">New Application</Link>
+          <Link href="/loans/new">New Application</Link>
         </Button>
-      </div>
+      </header>
 
       <Card className="bg-muted/50">
         <CardHeader>

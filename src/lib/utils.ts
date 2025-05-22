@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { CLientType } from "@/lib/types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -29,4 +30,18 @@ export const formatDate = (isoDate: string) => {
   });
 
   return formatted;
+};
+
+export const getClientsThisMonth = (clients: CLientType[]): number => {
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  return clients.filter((client) => {
+    const createdAt = new Date(client.created_at);
+    return (
+      createdAt.getMonth() === currentMonth &&
+      createdAt.getFullYear() === currentYear
+    );
+  }).length;
 };

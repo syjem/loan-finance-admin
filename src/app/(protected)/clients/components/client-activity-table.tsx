@@ -27,7 +27,7 @@ import {
 
 // Sample activity data for clients
 const clientActivities = {
-  "1": [
+  "1be86f6b-0b6d-4628-be80-9fa20b96e8c9": [
     {
       id: "1",
       type: "loan_application",
@@ -102,7 +102,7 @@ export function ClientActivityTable({ clientId }: { clientId: string }) {
     clientActivities[clientId as keyof typeof clientActivities] || [];
 
   return (
-    <Card>
+    <Card className="bg-muted/50">
       <CardHeader>
         <CardTitle>Recent Activity</CardTitle>
         <CardDescription>

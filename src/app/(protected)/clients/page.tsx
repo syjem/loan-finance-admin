@@ -6,6 +6,13 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ClientStats } from "@/app/(protected)/clients/components/client-stats";
 import { ClientsTable } from "@/app/(protected)/clients/components/clients-table";
+import {
+  getActiveBorrowers,
+  getClients,
+  getTotalNumberOfClients,
+  getBusinessClients,
+  getClientsThisMonth,
+} from "@/app/data";
 
 export const metadata: Metadata = {
   title: "Client Management",
@@ -13,13 +20,27 @@ export const metadata: Metadata = {
 };
 
 const ClientsPage = async () => {
+  const [
+    clients,
+    totalNumberOfClients,
+    totalActiveBorrowers,
+    totalBusinessClients,
+    totalClientsThisMonth,
+  ] = await Promise.all([
+    getClients(),
+    getTotalNumberOfClients(),
+    getActiveBorrowers(),
+    getBusinessClients(),
+    getClientsThisMonth(),
+  ]);
+
   return (
-    <>
+    <div className="container space-y-6">
       <header className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2 h-4 shrink-0">
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="h-2 -ml-1 border" />
-          <h1 className="text-sm font-medium tracking-tight">
+          <h1 className="text-base font-medium tracking-tight">
             Client Management
           </h1>
         </div>
@@ -28,10 +49,15 @@ const ClientsPage = async () => {
         </Button>
       </header>
       <div className="container space-y-6">
-        <ClientStats />
-        <ClientsTable />
+        <ClientStats
+          totalNumberOfClients={totalNumberOfClients}
+          activeBorrowers={totalActiveBorrowers}
+          businessClients={totalBusinessClients}
+          totalClientsThisMonth={totalClientsThisMonth}
+        />
+        <ClientsTable clients={clients} />
       </div>
-    </>
+    </div>
   );
 };
 

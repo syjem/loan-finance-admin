@@ -17,7 +17,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  getTotalClients,
+  getTotalNumberOfClients,
   getLoanStats,
   getClientsTotalValue,
   getRecentLoanApplications,
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
 export default async function Dashboard() {
   const [numberOfClients, stats, clientsTotalValue, recentLoanApplications] =
     await Promise.all([
-      getTotalClients(),
+      getTotalNumberOfClients(),
       getLoanStats(),
       getClientsTotalValue(),
       getRecentLoanApplications(),
@@ -42,11 +42,11 @@ export default async function Dashboard() {
         <div className="flex items-center gap-2 h-4 shrink-0">
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="h-2 -ml-1 border" />
-          <h1 className="text-sm font-medium tracking-tight">Dashboard</h1>
+          <h1 className="text-base font-medium tracking-tight">Dashboard</h1>
         </div>
 
         <Button asChild>
-          <Link href="/loan-application/new">New Loan Application</Link>
+          <Link href="/loans/new">New Loan Application</Link>
         </Button>
       </header>
 

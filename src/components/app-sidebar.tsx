@@ -30,7 +30,7 @@ const items = [
   },
   {
     title: "Loan Application",
-    url: "/loan-application",
+    url: "/loans",
     icon: CreditCard,
   },
 ];

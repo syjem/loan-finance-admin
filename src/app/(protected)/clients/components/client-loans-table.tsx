@@ -21,7 +21,7 @@ import {
 
 // Sample loan data for a client
 const clientLoans = {
-  "1": [
+  "1be86f6b-0b6d-4628-be80-9fa20b96e8c9": [
     {
       id: "LOAN-7890",
       amount: "$175,000",
@@ -81,7 +81,7 @@ export function ClientLoansTable({ clientId }: { clientId: string }) {
   const loans = clientLoans[clientId as keyof typeof clientLoans] || [];
 
   return (
-    <Card>
+    <Card className="bg-muted/50">
       <CardHeader>
         <CardTitle>Loan Applications</CardTitle>
         <CardDescription>

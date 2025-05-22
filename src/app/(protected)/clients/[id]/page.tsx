@@ -31,6 +31,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ClientLoansTable } from "@/app/(protected)/clients/components/client-loans-table";
 import { ClientActivityTable } from "@/app/(protected)/clients/components/client-activity-table";
 import { ClientDocumentsTable } from "@/app/(protected)/clients/components/client-documents-table";
+import { getClients } from "@/app/data";
+import { formatCurrency, getInitials } from "@/lib/utils";
+import { format } from "date-fns";
 
 type ParamsType = {
   params: Promise<{ id: string }>;
@@ -40,6 +43,7 @@ export const generateMetadata = async ({
   params,
 }: ParamsType): Promise<Metadata> => {
   const id = (await params).id;
+  const clients = await getClients();
   const client = clients.find((c) => c.id === id);
 
   if (!client) {
@@ -49,61 +53,17 @@ export const generateMetadata = async ({
   }
 
   return {
-    title: `${client.name} - Client Details`,
-    description: `Client information for ${client.name}`,
+    title: `${client.firstName} ${client.lastName} - Client Details`,
+    description: `Client information for ${client.firstName}`,
   };
-};
-
-const clients = [
-  {
-    id: "1",
-    name: "Alex Johnson",
-    email: "alex@johnson.com",
-    phone: "(123) 456-7890",
-    company: "Johnson Enterprises",
-    type: "Business",
-    status: "Active",
-    address: "123 Business Ave, Suite 100, San Francisco, CA 94107",
-    totalLoans: 3,
-    totalAmount: "$450,000",
-    lastActivity: "2023-05-10",
-    initials: "AJ",
-    joinDate: "2021-03-15",
-  },
-  {
-    id: "2",
-    name: "Sarah Williams",
-    email: "sarah@williams.com",
-    phone: "(234) 567-8901",
-    company: "Williams Group",
-    type: "Business",
-    status: "Active",
-    address: "456 Corporate Blvd, Chicago, IL 60601",
-    totalLoans: 2,
-    totalAmount: "$380,000",
-    lastActivity: "2023-05-08",
-    initials: "SW",
-    joinDate: "2021-06-22",
-  },
-  // Add more clients as needed
-];
-
-export type Client = {
-  id: string;
-  created_at: string;
-  name: string;
-  email: string;
-  avatar: string;
-  phone: string;
-  address: string;
-  status: "active" | "inactive" | "blacklisted";
-  bio: string;
 };
 
 const ClientProfilePage = async ({ params }: ParamsType) => {
   const id = (await params).id;
+  const clients = await getClients();
 
   const client = clients.find((c) => c.id === id);
+  const clientName = `${client.firstName} ${client.lastName}`;
 
   if (!client) {
     notFound();
@@ -117,13 +77,15 @@ const ClientProfilePage = async ({ params }: ParamsType) => {
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink asChild>
+              <BreadcrumbLink asChild className="text-base">
                 <Link href="/clients">Clients</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage className="font-semibold">{id}</BreadcrumbPage>
+              <BreadcrumbPage className="font-semibold">
+                {clientName}
+              </BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
@@ -134,26 +96,24 @@ const ClientProfilePage = async ({ params }: ParamsType) => {
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <div className="flex items-center gap-4">
               <Avatar className="h-16 w-16">
-                <AvatarImage
-                  src={`/placeholder.svg?height=64&width=64`}
-                  alt={client.name}
-                />
+                <AvatarImage src={client.avatar} alt={clientName} />
                 <AvatarFallback className="text-xl">
-                  {client.initials}
+                  {getInitials(clientName)}
                 </AvatarFallback>
               </Avatar>
-              <div>
-                <h1 className="text-3xl font-bold">{client.name}</h1>
+              <div className="space-y-2">
+                <h1 className="text-3xl font-bold">{clientName}</h1>
                 <div className="flex items-center gap-2">
                   <Badge
+                    className="capitalize"
                     variant={
-                      client.status === "Active" ? "default" : "secondary"
+                      client.status === "active" ? "default" : "secondary"
                     }
                   >
                     {client.status}
                   </Badge>
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    {client.type === "Business" ? (
+                  <div className="flex items-center text-sm text-muted-foreground capitalize">
+                    {client.type === "business" ? (
                       <Building className="mr-1 h-3 w-3" />
                     ) : (
                       <Users className="mr-1 h-3 w-3" />
@@ -163,16 +123,16 @@ const ClientProfilePage = async ({ params }: ParamsType) => {
                 </div>
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <Button variant="outline" asChild>
                 <Link href={`/clients/${client.id}/edit`}>
-                  <Edit className="mr-2 h-4 w-4" />
+                  <Edit className="h-4 w-4" />
                   Edit Client
                 </Link>
               </Button>
               <Button asChild>
-                <Link href={`/deals/new?client=${client.id}`}>
-                  <Plus className="mr-2 h-4 w-4" />
+                <Link href={`/loans/new?client=${client.id}`}>
+                  <Plus className="h-4 w-4" />
                   New Loan
                 </Link>
               </Button>
@@ -180,9 +140,9 @@ const ClientProfilePage = async ({ params }: ParamsType) => {
           </div>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-4 lg:grid-cols-3">
           <div className="lg:col-span-1">
-            <Card>
+            <Card className="bg-muted/50">
               <CardHeader>
                 <CardTitle>Client Information</CardTitle>
               </CardHeader>
@@ -197,18 +157,18 @@ const ClientProfilePage = async ({ params }: ParamsType) => {
                   </div>
                   <div className="flex items-center gap-2">
                     <Phone className="h-4 w-4 text-muted-foreground" />
-                    <span>{client.phone}</span>
+                    <span>{client.phoneNumber}</span>
                   </div>
                 </div>
 
-                {client.company && (
+                {client.companyName && (
                   <div className="space-y-1">
                     <div className="text-sm font-medium text-muted-foreground">
                       Company
                     </div>
                     <div className="flex items-center gap-2">
                       <Building className="h-4 w-4 text-muted-foreground" />
-                      <span>{client.company}</span>
+                      <span>{client.companyName}</span>
                     </div>
                   </div>
                 )}
@@ -230,14 +190,14 @@ const ClientProfilePage = async ({ params }: ParamsType) => {
                   <div className="grid grid-cols-2 gap-2">
                     <div className="text-sm">Client Since</div>
                     <div className="text-sm font-medium">
-                      {new Date(client.joinDate).toLocaleDateString()}
+                      {format(client.created_at, "MMM d, yyyy")}
                     </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="mt-6">
+            <Card className="mt-4 bg-muted/50">
               <CardHeader>
                 <CardTitle>Loan Summary</CardTitle>
               </CardHeader>
@@ -248,7 +208,7 @@ const ClientProfilePage = async ({ params }: ParamsType) => {
                       Total Loans
                     </div>
                     <div className="text-2xl font-bold">
-                      {client.totalLoans}
+                      {client.loans.length}
                     </div>
                   </div>
                   <div>
@@ -256,7 +216,13 @@ const ClientProfilePage = async ({ params }: ParamsType) => {
                       Total Amount
                     </div>
                     <div className="text-2xl font-bold">
-                      {client.totalAmount}
+                      {formatCurrency(
+                        client.loans.reduce(
+                          (sum: number, loan: { amount: number }) =>
+                            sum + loan.amount,
+                          0
+                        )
+                      )}
                     </div>
                   </div>
                 </div>
@@ -266,13 +232,29 @@ const ClientProfilePage = async ({ params }: ParamsType) => {
                     Last Activity
                   </div>
                   <div className="text-sm">
-                    {new Date(client.lastActivity).toLocaleDateString()}
+                    {client.loans.length > 0
+                      ? format(
+                          new Date(
+                            client.loans
+                              .slice()
+                              .sort(
+                                (
+                                  a: { created_at: string },
+                                  b: { created_at: string }
+                                ) =>
+                                  new Date(b.created_at).getTime() -
+                                  new Date(a.created_at).getTime()
+                              )[0].created_at
+                          ),
+                          "MMM d, yyyy"
+                        )
+                      : "No activity"}
                   </div>
                 </div>
 
                 <div className="pt-2">
                   <Button variant="outline" className="w-full" asChild>
-                    <Link href={`/deals?client=${client.id}`}>
+                    <Link href={`/loans?client=${client.id}`}>
                       <FileText className="mr-2 h-4 w-4" />
                       View All Loans
                     </Link>
@@ -289,13 +271,13 @@ const ClientProfilePage = async ({ params }: ParamsType) => {
                 <TabsTrigger value="activity">Activity</TabsTrigger>
                 <TabsTrigger value="documents">Documents</TabsTrigger>
               </TabsList>
-              <TabsContent value="loans" className="mt-4">
+              <TabsContent value="loans" className="mt-2">
                 <ClientLoansTable clientId={client.id} />
               </TabsContent>
-              <TabsContent value="activity" className="mt-4">
+              <TabsContent value="activity" className="mt-2">
                 <ClientActivityTable clientId={client.id} />
               </TabsContent>
-              <TabsContent value="documents" className="mt-4">
+              <TabsContent value="documents" className="mt-2">
                 <ClientDocumentsTable clientId={client.id} />
               </TabsContent>
             </Tabs>

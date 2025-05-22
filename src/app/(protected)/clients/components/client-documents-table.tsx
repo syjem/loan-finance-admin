@@ -20,7 +20,7 @@ import {
 
 // Sample documents data for clients
 const clientDocuments = {
-  "1": [
+  "1be86f6b-0b6d-4628-be80-9fa20b96e8c9": [
     {
       id: "1",
       name: "Business Plan.pdf",
@@ -95,7 +95,7 @@ export function ClientDocumentsTable({ clientId }: { clientId: string }) {
     clientDocuments[clientId as keyof typeof clientDocuments] || [];
 
   return (
-    <Card>
+    <Card className="bg-muted/50">
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
           <CardTitle>Documents</CardTitle>
