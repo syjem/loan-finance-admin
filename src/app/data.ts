@@ -13,6 +13,16 @@ export const getClients = async () => {
   return data || [];
 };
 
+export const getClientById = async (id: string) => {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("clients")
+    .select(`*, loans(id, created_at, amount)`)
+    .eq("id", id);
+
+  return data || [];
+};
+
 export const getTotalNumberOfClients = async () => {
   const supabase = await createClient();
   const { count, error } = await supabase
@@ -102,20 +112,13 @@ export const getRecentLoanApplications = async () => {
   return data ?? [];
 };
 
-export const getClientById = async (id: string) => {
-  const supabase = await createClient();
-  const { data } = await supabase.from("customers").select("*").eq("id", id);
-
-  return data;
-};
-
-export const getClientTransactionById = async (id: string) => {
+export const getClientLoansById = async (id: string) => {
   const supabase = await createClient();
   const { data } = await supabase
-    .from("transactions")
+    .from("loans")
     .select("*")
-    .eq("customer_id", id)
+    .eq("client_id", id)
     .order("created_at", { ascending: false });
 
-  return data;
+  return data ?? [];
 };

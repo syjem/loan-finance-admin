@@ -1,11 +1,11 @@
 "use client";
 
 import { z } from "zod";
-import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -31,14 +31,13 @@ import {
   addClientFormSchema as formSchema,
   addClientDefaultValues as defaultValues,
 } from "@/lib/schema";
+import { toast } from "sonner";
 
-type FormValues = z.infer<typeof formSchema>;
+export type AddClientFormValues = z.infer<typeof formSchema>;
 
 export function AddClientForm() {
   const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const form = useForm<FormValues>({
+  const form = useForm<AddClientFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues,
   });
@@ -54,17 +53,31 @@ export function AddClientForm() {
     }
   }, [clientType, form]);
 
-  const onSubmit = async (data: FormValues) => {
-    setIsSubmitting(true);
-
+  const onSubmit = async (data: AddClientFormValues) => {
     try {
-      await addClient(data);
+      const result = await addClient(data);
 
+      if (!result.success) {
+        toast.error("Submission failed", {
+          description:
+            result.message || "An error occurred while adding the client.",
+        });
+
+        return; // ⛔ Stop here if there's an error
+      }
+
+      // ✅ Success
       router.push("/clients");
+      toast.success("Success!", {
+        description:
+          result.message ||
+          "The loan application has been submitted successfully.",
+      });
     } catch (error) {
       console.error("Error submitting form:", error);
-    } finally {
-      setIsSubmitting(false);
+      toast.error("Unexpected Error", {
+        description: "Something went wrong. Please try again later.",
+      });
     }
   };
 
@@ -123,7 +136,7 @@ export function AddClientForm() {
 
                 <FormField
                   control={form.control}
-                  name="phone"
+                  name="phoneNumber"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Phone Number</FormLabel>
@@ -228,8 +241,8 @@ export function AddClientForm() {
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? (
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Saving...

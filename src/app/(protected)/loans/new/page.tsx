@@ -8,7 +8,14 @@ export const metadata: Metadata = {
   description: "Submit a new loan application for a client",
 };
 
-export default function NewLoanApplicationPage() {
+type SearchParams = Promise<{ [key: string]: string | undefined }>;
+
+export default async function NewLoanApplicationPage(props: {
+  searchParams: SearchParams;
+}) {
+  const searchParams = await props.searchParams;
+  const clientId = searchParams.client;
+
   return (
     <div className="container max-w-3xl space-y-6">
       <header className="flex items-center justify-between">
@@ -20,7 +27,7 @@ export default function NewLoanApplicationPage() {
           </h1>
         </div>
       </header>
-      <LoanApplicationForm />
+      <LoanApplicationForm client={clientId} />
     </div>
   );
 }

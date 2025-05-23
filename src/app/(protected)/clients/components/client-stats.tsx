@@ -40,8 +40,8 @@ export function ClientStats({
             {activeBorrowers}
           </div>
           <p className="text-xs text-muted-foreground">
-            {activeBorrowers * (totalNumberOfClients / 100) * 100}% of total
-            clients
+            {((activeBorrowers / totalNumberOfClients) * 100).toFixed(0)}% of
+            total clients
           </p>
         </CardContent>
       </Card>
@@ -57,8 +57,8 @@ export function ClientStats({
             {businessClients}
           </div>
           <p className="text-xs text-muted-foreground">
-            {businessClients * (totalNumberOfClients / 100) * 100}% of total
-            clients
+            {((businessClients / totalNumberOfClients) * 100).toFixed(0)}% of
+            total clients
           </p>
         </CardContent>
       </Card>

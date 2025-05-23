@@ -2,13 +2,15 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { FormValues } from "@/lib/types";
+import { AddClientFormValues } from "@/app/(protected)/clients/components/add-client-form";
 
 export const createLoanApplication = async (formData: FormValues) => {
+  console.log(formData);
   const supabase = await createClient();
 
-  if (formData.client_id) {
+  if (formData.clientId) {
     const loanData = {
-      client_id: formData.client_id,
+      client_id: formData.clientId,
       purpose: formData.loanPurpose,
       amount: parseInt(formData.loanAmount, 10),
       term: formData.loanTerm,
@@ -32,7 +34,6 @@ export const createLoanApplication = async (formData: FormValues) => {
     };
   }
 
-  // No clientId - use transaction for new client + loan
   const { error } = await supabase.rpc("create_client_and_loan", {
     p_amount: parseInt(formData.loanAmount, 10),
     p_company: formData.companyName || null,
@@ -41,16 +42,16 @@ export const createLoanApplication = async (formData: FormValues) => {
     p_interest_rate: parseFloat(formData.interestRate),
     p_last_name: formData.lastName,
     p_notes: formData.additionalNotes,
-    p_phone: formData.phoneNumber,
+    p_phone: formData.phone,
     p_purpose: formData.loanPurpose,
     p_term: formData.loanTerm,
   });
 
   if (error) {
-    console.error(error.message + " " + error.details);
+    console.error(error.message + " " + error.details); // debugging
     return {
       success: false,
-      message: error.message,
+      message: "An error occurred while sumitting the loan application.",
       error,
     };
   }
@@ -61,20 +62,23 @@ export const createLoanApplication = async (formData: FormValues) => {
   };
 };
 
-export async function addClient(data: any) {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 1500));
+export async function addClient(data: AddClientFormValues) {
+  const supabase = await createClient();
 
-  // Log the data (in a real app, you would save to database)
-  console.log("Client created:", data);
+  const { error } = await supabase.from(`clients`).insert(data);
+
+  if (error) {
+    console.error(error.message + " " + error.details); // debugging
+    return {
+      success: false,
+      message: "An error occurred while adding the client.",
+      error,
+    };
+  }
 
   // Return a success response
   return {
     success: true,
     message: "Client created successfully",
-    data: {
-      id: `CLIENT-${Math.floor(Math.random() * 10000)}`,
-      ...data,
-    },
   };
 }

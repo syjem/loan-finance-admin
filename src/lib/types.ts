@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { formSchema } from "./schema";
+import { loanApplicationFormSchema } from "./schema";
 
-export type FormValues = z.infer<typeof formSchema>;
+export type FormValues = z.infer<typeof loanApplicationFormSchema>;
 
 export type ClientInformation = {
   id: string;

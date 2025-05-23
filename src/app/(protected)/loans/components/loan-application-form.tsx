@@ -1,7 +1,7 @@
 "use client";
 
 import { toast } from "sonner";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { format } from "date-fns";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
@@ -57,7 +57,11 @@ import {
   LOANTERMS as terms,
 } from "@/lib/constants";
 
-export function LoanApplicationForm() {
+export function LoanApplicationForm({
+  client,
+}: {
+  client: string | undefined;
+}) {
   const router = useRouter();
   const { clients } = useClient();
   const [currentStep, setCurrentStep] = useState(0);
@@ -69,22 +73,32 @@ export function LoanApplicationForm() {
   });
 
   // Auto-fill form when client is selected
-  const handleClientSelect = async (clientId: string) => {
-    try {
-      const selectedClient = await getClientById(clientId);
-      const client = selectedClient[0];
+  const handleClientSelect = useCallback(
+    async (clientId: string) => {
+      try {
+        const selectedClient = await getClientById(clientId);
+        const client = selectedClient[0];
 
-      if (client) {
-        form.setValue("firstName", client.firstName);
-        form.setValue("lastName", client.lastName);
-        form.setValue("email", client.email);
-        form.setValue("phone", client.phoneNumber);
-        form.setValue("companyName", client.companyName || "");
+        if (client) {
+          form.setValue("firstName", client.firstName);
+          form.setValue("lastName", client.lastName);
+          form.setValue("email", client.email);
+          form.setValue("phone", client.phoneNumber);
+          form.setValue("companyName", client.companyName || "");
+        }
+      } catch (error) {
+        console.error("Failed to fetch client info:", error);
       }
-    } catch (error) {
-      console.error("Failed to fetch client info:", error);
+    },
+    [form]
+  );
+
+  useEffect(() => {
+    if (client) {
+      form.setValue("clientId", client);
+      handleClientSelect(client);
     }
-  };
+  }, [client, form, handleClientSelect]);
 
   // Check if fields in the current step are valid
   const validateStep = async () => {
@@ -125,7 +139,7 @@ export function LoanApplicationForm() {
       }
 
       // ✅ Success
-      router.push("/loan-application");
+      router.push("/loans");
       toast.success("Success!", {
         description:
           result.message ||

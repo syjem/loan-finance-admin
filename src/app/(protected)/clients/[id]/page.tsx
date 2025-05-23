@@ -29,9 +29,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ClientLoansTable } from "@/app/(protected)/clients/components/client-loans-table";
-import { ClientActivityTable } from "@/app/(protected)/clients/components/client-activity-table";
 import { ClientDocumentsTable } from "@/app/(protected)/clients/components/client-documents-table";
-import { getClients } from "@/app/data";
+import { getClientById } from "@/app/data";
 import { formatCurrency, getInitials } from "@/lib/utils";
 import { format } from "date-fns";
 
@@ -43,14 +42,15 @@ export const generateMetadata = async ({
   params,
 }: ParamsType): Promise<Metadata> => {
   const id = (await params).id;
-  const clients = await getClients();
-  const client = clients.find((c) => c.id === id);
+  const data = await getClientById(id);
 
-  if (!client) {
+  if (!data || data.length === 0) {
     return {
       title: "Client Not Found",
     };
   }
+
+  const client = data[0];
 
   return {
     title: `${client.firstName} ${client.lastName} - Client Details`,
@@ -60,14 +60,14 @@ export const generateMetadata = async ({
 
 const ClientProfilePage = async ({ params }: ParamsType) => {
   const id = (await params).id;
-  const clients = await getClients();
+  const data = await getClientById(id);
 
-  const client = clients.find((c) => c.id === id);
-  const clientName = `${client.firstName} ${client.lastName}`;
-
-  if (!client) {
+  if (!data || data.length === 0) {
     notFound();
   }
+
+  const client = data[0];
+  const clientName = `${client.firstName} ${client.lastName}`;
 
   return (
     <>
@@ -266,16 +266,12 @@ const ClientProfilePage = async ({ params }: ParamsType) => {
 
           <div className="lg:col-span-2">
             <Tabs defaultValue="loans">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="loans">Loans</TabsTrigger>
-                <TabsTrigger value="activity">Activity</TabsTrigger>
                 <TabsTrigger value="documents">Documents</TabsTrigger>
               </TabsList>
               <TabsContent value="loans" className="mt-2">
                 <ClientLoansTable clientId={client.id} />
-              </TabsContent>
-              <TabsContent value="activity" className="mt-2">
-                <ClientActivityTable clientId={client.id} />
               </TabsContent>
               <TabsContent value="documents" className="mt-2">
                 <ClientDocumentsTable clientId={client.id} />

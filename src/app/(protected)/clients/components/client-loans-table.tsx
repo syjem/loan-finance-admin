@@ -1,4 +1,4 @@
-import { FileText, ArrowUpDown } from "lucide-react";
+import { FileText } from "lucide-react";
 import { format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
@@ -18,75 +18,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { getClientLoansById } from "@/app/data";
+import { formatCurrency } from "@/lib/utils";
+import Link from "next/link";
 
-// Sample loan data for a client
-const clientLoans = {
-  "1be86f6b-0b6d-4628-be80-9fa20b96e8c9": [
-    {
-      id: "LOAN-7890",
-      amount: "$175,000",
-      purpose: "Business Expansion",
-      startDate: new Date("2023-01-15"),
-      term: "5 Years",
-      status: "Active",
-      nextPayment: new Date("2023-06-15"),
-      paymentAmount: "$3,500",
-    },
-    {
-      id: "LOAN-6543",
-      amount: "$125,000",
-      purpose: "Equipment Financing",
-      startDate: new Date("2022-08-10"),
-      term: "3 Years",
-      status: "Active",
-      nextPayment: new Date("2023-06-10"),
-      paymentAmount: "$4,200",
-    },
-    {
-      id: "LOAN-5432",
-      amount: "$150,000",
-      purpose: "Working Capital",
-      startDate: new Date("2021-05-20"),
-      term: "5 Years",
-      status: "Active",
-      nextPayment: new Date("2023-06-20"),
-      paymentAmount: "$3,100",
-    },
-  ],
-  "2": [
-    {
-      id: "LOAN-8901",
-      amount: "$230,000",
-      purpose: "Property Purchase",
-      startDate: new Date("2022-11-05"),
-      term: "10 Years",
-      status: "Active",
-      nextPayment: new Date("2023-06-05"),
-      paymentAmount: "$2,800",
-    },
-    {
-      id: "LOAN-7654",
-      amount: "$150,000",
-      purpose: "Business Expansion",
-      startDate: new Date("2021-09-15"),
-      term: "5 Years",
-      status: "Active",
-      nextPayment: new Date("2023-06-15"),
-      paymentAmount: "$3,200",
-    },
-  ],
-};
-
-export function ClientLoansTable({ clientId }: { clientId: string }) {
-  const loans = clientLoans[clientId as keyof typeof clientLoans] || [];
+export const ClientLoansTable = async ({ clientId }: { clientId: string }) => {
+  const loans = await getClientLoansById(clientId);
+  console.log(loans);
 
   return (
     <Card className="bg-muted/50">
       <CardHeader>
         <CardTitle>Loan Applications</CardTitle>
-        <CardDescription>
-          View and manage client&apos;s loan applications
-        </CardDescription>
+        <CardDescription>View client&apos;s loan applications</CardDescription>
       </CardHeader>
       <CardContent>
         {loans.length === 0 ? (
@@ -95,8 +39,8 @@ export function ClientLoansTable({ clientId }: { clientId: string }) {
               <p className="text-muted-foreground">
                 No loans found for this client.
               </p>
-              <Button className="mt-4" variant="outline">
-                Create New Loan
+              <Button asChild className="mt-4" variant="outline">
+                <Link href={`/loans/new?client=${clientId}`}>Create New</Link>
               </Button>
             </div>
           </div>
@@ -105,19 +49,7 @@ export function ClientLoansTable({ clientId }: { clientId: string }) {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>
-                    <div className="flex items-center">
-                      Loan ID
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="ml-1 h-8 data-[state=open]:bg-accent"
-                      >
-                        <ArrowUpDown className="h-4 w-4" />
-                        <span className="sr-only">Sort</span>
-                      </Button>
-                    </div>
-                  </TableHead>
+                  <TableHead>Loan ID</TableHead>
                   <TableHead>Amount</TableHead>
                   <TableHead className="hidden md:table-cell">
                     Purpose
@@ -126,7 +58,9 @@ export function ClientLoansTable({ clientId }: { clientId: string }) {
                     Start Date
                   </TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Next Payment</TableHead>
+                  <TableHead className="text-right">
+                    Term & Interest Rate
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -135,25 +69,23 @@ export function ClientLoansTable({ clientId }: { clientId: string }) {
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <FileText className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-medium">{loan.id}</span>
+                        <span className="font-medium">LOAN-{loan.id}</span>
                       </div>
                     </TableCell>
-                    <TableCell>{loan.amount}</TableCell>
-                    <TableCell className="hidden md:table-cell">
+                    <TableCell>{formatCurrency(loan.amount)}</TableCell>
+                    <TableCell className="hidden md:table-cell capitalize">
                       {loan.purpose}
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
-                      {format(loan.startDate, "MMM d, yyyy")}
+                      {format(loan.created_at, "MMM d, yyyy")}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="capitalize">
                       <Badge variant="default">{loan.status}</Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="font-medium">
-                        {format(loan.nextPayment, "MMM d, yyyy")}
-                      </div>
+                      <div className="font-medium">{loan.term}</div>
                       <div className="text-sm text-muted-foreground">
-                        {loan.paymentAmount}
+                        {loan.interest_rate}%
                       </div>
                     </TableCell>
                   </TableRow>
@@ -165,4 +97,4 @@ export function ClientLoansTable({ clientId }: { clientId: string }) {
       </CardContent>
     </Card>
   );
-}
+};
