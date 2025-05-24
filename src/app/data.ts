@@ -122,3 +122,15 @@ export const getClientLoansById = async (id: string) => {
 
   return data ?? [];
 };
+
+export const getLoansById = async (id: string) => {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("loans")
+    .select(`*, clients(*)`)
+    .eq("id", id);
+
+  if (error) return [];
+
+  return data ?? [];
+};

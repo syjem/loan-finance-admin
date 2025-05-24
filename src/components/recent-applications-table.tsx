@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn, formatCurrency, getInitials } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRecentLoanApplications } from "@/hooks/subscriptions/use-recent-application";
+import { useRouter } from "next/navigation";
 
 type Props = {
   firstName: string;
@@ -32,7 +33,13 @@ const RecentApplicationTable = ({
 }: {
   recentLoanApplications: Props[];
 }) => {
+  const router = useRouter();
   const { data = recentLoanApplications } = useRecentLoanApplications();
+
+  const handleRowClick = (loanId: string) => {
+    router.push(`/loans/details?id=${loanId}`);
+  };
+
   return (
     <Table>
       <TableHeader>
@@ -47,7 +54,11 @@ const RecentApplicationTable = ({
       </TableHeader>
       <TableBody>
         {data.map((item) => (
-          <TableRow key={item.id}>
+          <TableRow
+            key={item.id}
+            onClick={() => handleRowClick(item.id)}
+            className="cursor-pointer"
+          >
             <TableCell className="font-medium">LOAN-{item.id}</TableCell>
             <TableCell className="flex items-center gap-2">
               <Avatar>
@@ -74,12 +85,12 @@ const RecentApplicationTable = ({
             <TableCell>
               <Badge
                 className={cn(
-                  "text-xs capitalize",
-                  item.status === "active" && "bg-sky-500/50 text-sky-200",
-                  item.status === "overdue" &&
-                    "bg-yellow-700/50 text-yellow-300",
-                  item.status === "completed" &&
-                    "bg-emerald-800/50 text-emerald-300"
+                  "text-xs capitalize rounded-full",
+                  item.status === "active"
+                    ? "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100"
+                    : item.status === "overdue"
+                    ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100"
+                    : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
                 )}
               >
                 {item.status}

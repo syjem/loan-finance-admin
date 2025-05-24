@@ -331,9 +331,9 @@ export function ClientsTable({ clients }: { clients: CLientType[] }) {
                       </TableCell>
                       <TableCell>
                         <Badge
-                          className="capitalize"
+                          className="capitalize rounded-full"
                           variant={
-                            client.status === "active" ? "default" : "secondary"
+                            client.status === "active" ? "default" : "outline"
                           }
                         >
                           {client.status}

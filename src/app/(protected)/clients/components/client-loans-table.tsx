@@ -24,7 +24,6 @@ import Link from "next/link";
 
 export const ClientLoansTable = async ({ clientId }: { clientId: string }) => {
   const loans = await getClientLoansById(clientId);
-  console.log(loans);
 
   return (
     <Card className="bg-muted/50">

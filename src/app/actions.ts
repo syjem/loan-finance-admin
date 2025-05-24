@@ -34,6 +34,7 @@ export const createLoanApplication = async (formData: FormValues) => {
     };
   }
 
+  // if no clientId, call rpc("create_client_and_loan") to create the client first then add the loan
   const { error } = await supabase.rpc("create_client_and_loan", {
     p_amount: parseInt(formData.loanAmount, 10),
     p_company: formData.companyName || null,
@@ -51,14 +52,14 @@ export const createLoanApplication = async (formData: FormValues) => {
     console.error(error.message + " " + error.details); // debugging
     return {
       success: false,
-      message: "An error occurred while sumitting the loan application.",
+      message: "An error occurred while submitting the loan application.",
       error,
     };
   }
 
   return {
     success: true,
-    message: "Client and loan submitted successfully.",
+    message: "Client created and loan submitted successfully.",
   };
 };
 
@@ -80,5 +81,40 @@ export async function addClient(data: AddClientFormValues) {
   return {
     success: true,
     message: "Client created successfully",
+  };
+}
+
+export async function updateLoan(loanId: number, data: any) {
+  // Simulate API delay
+  await new Promise((resolve) => setTimeout(resolve, 1500));
+
+  // Log the update (in a real app, you would update the database)
+  console.log(`Loan ${loanId} updated:`, data);
+
+  // Return a success response
+  return {
+    success: true,
+    message: "Loan updated successfully",
+    data: {
+      loanId,
+      ...data,
+    },
+  };
+}
+
+export async function deleteLoan(loanId: number) {
+  // Simulate API delay
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  // Log the deletion (in a real app, you would delete from database)
+  console.log(`Loan ${loanId} deleted`);
+
+  // Return a success response
+  return {
+    success: true,
+    message: "Loan deleted successfully",
+    data: {
+      loanId,
+    },
   };
 }

@@ -1,6 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { CLientType } from "@/lib/types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -32,16 +31,39 @@ export const formatDate = (isoDate: string) => {
   return formatted;
 };
 
-export const getClientsThisMonth = (clients: CLientType[]): number => {
-  const now = new Date();
-  const currentMonth = now.getMonth();
-  const currentYear = now.getFullYear();
+export const getMonthlyPayment = (
+  amount: number,
+  interest: number,
+  term: string
+) => {
+  let months: number;
 
-  return clients.filter((client) => {
-    const createdAt = new Date(client.created_at);
-    return (
-      createdAt.getMonth() === currentMonth &&
-      createdAt.getFullYear() === currentYear
-    );
-  }).length;
+  switch (term) {
+    case "15 days":
+      months = 0.5;
+      break;
+    case "1 month":
+      months = 1;
+      break;
+    case "2 months":
+      months = 2;
+      break;
+    case "3 months":
+      months = 3;
+      break;
+    case "6 months":
+      months = 6;
+      break;
+    case "1 year":
+      months = 12;
+      break;
+    default:
+      throw new Error(`Unknown term: ${term}`);
+  }
+
+  const totalWithInterest = amount * (1 + interest / 100);
+
+  const monthlyPayment = totalWithInterest / months;
+
+  return Number(monthlyPayment.toFixed(2));
 };

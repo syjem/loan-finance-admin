@@ -12,24 +12,13 @@ import {
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import {
-  Building,
-  Edit,
-  FileText,
-  Mail,
-  MapPin,
-  Phone,
-  Plus,
-  Users,
-} from "lucide-react";
+import { Building, Edit, Mail, MapPin, Phone, Plus, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ClientLoansTable } from "@/app/(protected)/clients/components/client-loans-table";
-import { ClientDocumentsTable } from "@/app/(protected)/clients/components/client-documents-table";
 import { getClientById } from "@/app/data";
 import { formatCurrency, getInitials } from "@/lib/utils";
 import { format } from "date-fns";
@@ -177,7 +166,7 @@ const ClientProfilePage = async ({ params }: ParamsType) => {
                   <div className="text-sm font-medium text-muted-foreground">
                     Address
                   </div>
-                  <div className="flex items-start gap-2">
+                  <div className="flex items-center gap-2">
                     <MapPin className="h-4 w-4 text-muted-foreground" />
                     <span>{client.address}</span>
                   </div>
@@ -227,7 +216,7 @@ const ClientProfilePage = async ({ params }: ParamsType) => {
                   </div>
                 </div>
 
-                <div>
+                <div className="mt-4">
                   <div className="text-sm text-muted-foreground">
                     Last Activity
                   </div>
@@ -251,32 +240,12 @@ const ClientProfilePage = async ({ params }: ParamsType) => {
                       : "No activity"}
                   </div>
                 </div>
-
-                <div className="pt-2">
-                  <Button variant="outline" className="w-full" asChild>
-                    <Link href={`/loans?client=${client.id}`}>
-                      <FileText className="mr-2 h-4 w-4" />
-                      View All Loans
-                    </Link>
-                  </Button>
-                </div>
               </CardContent>
             </Card>
           </div>
 
           <div className="lg:col-span-2">
-            <Tabs defaultValue="loans">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="loans">Loans</TabsTrigger>
-                <TabsTrigger value="documents">Documents</TabsTrigger>
-              </TabsList>
-              <TabsContent value="loans" className="mt-2">
-                <ClientLoansTable clientId={client.id} />
-              </TabsContent>
-              <TabsContent value="documents" className="mt-2">
-                <ClientDocumentsTable clientId={client.id} />
-              </TabsContent>
-            </Tabs>
+            <ClientLoansTable clientId={client.id} />
           </div>
         </div>
       </div>
