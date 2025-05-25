@@ -52,5 +52,8 @@ export type Loan = {
   notes: string;
   interest_rate: number;
   status: "active" | "overdue" | "completed";
+  loanOfficer: string;
+  remainingBalance: number;
+  totalPayments: number;
   clients: Client;
 };

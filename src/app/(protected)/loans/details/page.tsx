@@ -5,14 +5,13 @@ import { ArrowLeft, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LoanDetailsView } from "../components/loan-details-view";
 import { LoanStatusManager } from "../components/loan-status-manager";
 import { LoanEditForm } from "../components/loan-edit-form";
 import { getLoansById } from "@/app/data";
 import type { Loan } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import LoanStatusBadge from "../components/loan-status-badge";
 
 export const generateMetadata = async ({
   searchParams,
@@ -20,7 +19,7 @@ export const generateMetadata = async ({
   searchParams: Promise<{ id: string }>;
 }): Promise<Metadata> => {
   const params = await searchParams;
-  const data = await getLoansById(params.id);
+  const data = await getLoansById(Number(params.id));
   const loan = data[0];
 
   if (!loan) {
@@ -41,7 +40,7 @@ export default async function LoanDetailsPage({
   searchParams: Promise<{ id: string }>;
 }) {
   const params = await searchParams;
-  const data = await getLoansById(params.id);
+  const data = await getLoansById(Number(params.id));
   const loan: Loan = data[0];
 
   if (!loan) {
@@ -61,20 +60,9 @@ export default async function LoanDetailsPage({
         </div>
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <h1 className="text-3xl font-bold">Loan-{loan.id}</h1>
+            <h1 className="text-3xl font-bold">LOAN-{loan.id}</h1>
             <div className="flex items-center gap-2 mt-2">
-              <Badge
-                className={cn(
-                  "capitalize rounded-full",
-                  loan.status === "active"
-                    ? "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100"
-                    : loan.status === "overdue"
-                    ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100"
-                    : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
-                )}
-              >
-                {loan.status}
-              </Badge>
+              <LoanStatusBadge status={loan.status} loanId={loan.id} />
               <span className="text-muted-foreground">•</span>
               <span className="text-muted-foreground">
                 {`${loan.clients.firstName} ${loan.clients.lastName}`}

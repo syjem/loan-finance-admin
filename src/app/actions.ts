@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { FormValues } from "@/lib/types";
 import { AddClientFormValues } from "@/app/(protected)/clients/components/add-client-form";
+import { LoanEditFormValues } from "./(protected)/loans/components/loan-edit-form";
 
 export const createLoanApplication = async (formData: FormValues) => {
   console.log(formData);
@@ -84,37 +85,71 @@ export async function addClient(data: AddClientFormValues) {
   };
 }
 
-export async function updateLoan(loanId: number, data: any) {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 1500));
+export const updateLoan = async (id: number, data: LoanEditFormValues) => {
+  const supabase = await createClient();
 
-  // Log the update (in a real app, you would update the database)
-  console.log(`Loan ${loanId} updated:`, data);
+  const { error } = await supabase
+    .from("loans")
+    .update({
+      amount: data.amount,
+      purpose: data.purpose,
+      term: data.term,
+      interest_rate: data.interest_rate,
+      created_at: data.created_at,
+      notes: data?.notes,
+    })
+    .eq("id", id);
+
+  if (error) {
+    return {
+      success: false,
+      message: `Failed to update loan, please try again.`,
+    };
+  }
+
+  return {
+    success: true,
+    message: `Loan successfully updated.`,
+  };
+};
+
+export async function updateLoanStatus(id: number, status: string) {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("loans")
+    .update({ status: status })
+    .eq("id", id);
+
+  if (error) {
+    return {
+      success: false,
+      message: `Failed to update status, please try again.`,
+    };
+  }
 
   // Return a success response
   return {
     success: true,
-    message: "Loan updated successfully",
-    data: {
-      loanId,
-      ...data,
-    },
+    message: `Status successfully updated to ${status}.`,
   };
 }
 
-export async function deleteLoan(loanId: number) {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+export async function deleteLoan(id: number) {
+  const supabase = await createClient();
 
-  // Log the deletion (in a real app, you would delete from database)
-  console.log(`Loan ${loanId} deleted`);
+  const { error } = await supabase.from("loans").delete().eq("id", id).select();
+
+  if (error) {
+    return {
+      success: false,
+      message: `Failed to delete loan, please try again.`,
+    };
+  }
 
   // Return a success response
   return {
     success: true,
     message: "Loan deleted successfully",
-    data: {
-      loanId,
-    },
   };
 }

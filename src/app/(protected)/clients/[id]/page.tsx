@@ -94,7 +94,7 @@ const ClientProfilePage = async ({ params }: ParamsType) => {
                 <h1 className="text-3xl font-bold">{clientName}</h1>
                 <div className="flex items-center gap-2">
                   <Badge
-                    className="capitalize"
+                    className="capitalize rounded-full"
                     variant={
                       client.status === "active" ? "default" : "secondary"
                     }

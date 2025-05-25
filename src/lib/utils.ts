@@ -36,34 +36,30 @@ export const getMonthlyPayment = (
   interest: number,
   term: string
 ) => {
-  let months: number;
-
   switch (term) {
     case "15 days":
-      months = 0.5;
-      break;
+      return Number((amount * (1 + interest / 100)).toFixed(2));
+
     case "1 month":
-      months = 1;
-      break;
+      return Number((amount * (1 + interest / 100)).toFixed(2));
+
     case "2 months":
-      months = 2;
-      break;
     case "3 months":
-      months = 3;
-      break;
     case "6 months":
-      months = 6;
-      break;
-    case "1 year":
-      months = 12;
-      break;
+    case "1 year": {
+      const months = {
+        "2 months": 2,
+        "3 months": 3,
+        "6 months": 6,
+        "1 year": 12,
+      }[term];
+
+      const totalWithInterest = amount * (1 + interest / 100);
+      const monthlyPayment = totalWithInterest / months;
+      return Number(monthlyPayment.toFixed(2));
+    }
+
     default:
       throw new Error(`Unknown term: ${term}`);
   }
-
-  const totalWithInterest = amount * (1 + interest / 100);
-
-  const monthlyPayment = totalWithInterest / months;
-
-  return Number(monthlyPayment.toFixed(2));
 };

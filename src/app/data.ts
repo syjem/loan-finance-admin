@@ -123,7 +123,7 @@ export const getClientLoansById = async (id: string) => {
   return data ?? [];
 };
 
-export const getLoansById = async (id: string) => {
+export const getLoansById = async (id: number) => {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("loans")

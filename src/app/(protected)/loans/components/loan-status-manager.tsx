@@ -25,9 +25,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { updateLoan, deleteLoan } from "@/app/actions";
+import { updateLoanStatus, deleteLoan } from "@/app/actions";
 import type { Loan } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 const statusOptions = [
   {
@@ -55,18 +56,31 @@ export function LoanStatusManager({ loan }: { loan: Loan }) {
   const [currentStatus, setCurrentStatus] = useState(loan.status);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleStatusChange = async (
     newStatus: "active" | "overdue" | "completed"
   ) => {
     setIsUpdating(true);
     try {
-      await updateLoan(loan.id, newStatus);
+      const result = await updateLoanStatus(loan.id, newStatus);
+
+      if (!result.success) {
+        toast.error("Error", {
+          description: result.message,
+        });
+        return;
+      }
+
       setCurrentStatus(newStatus);
-      // In a real app, you might want to show a success toast
+      toast.success("Success", {
+        description: result.message,
+      });
     } catch (error) {
       console.error("Error updating status:", error);
-      // Handle error - maybe show an error toast
+      toast.error("", {
+        description: "An error occured while updating the status.",
+      });
     } finally {
       setIsUpdating(false);
     }
@@ -75,11 +89,27 @@ export function LoanStatusManager({ loan }: { loan: Loan }) {
   const handleDeleteLoan = async () => {
     setIsDeleting(true);
     try {
-      await deleteLoan(loan.id);
-      router.push("/deals?deleted=true");
+      const result = await deleteLoan(loan.id);
+
+      if (!result.success) {
+        toast.error("Error", {
+          description: result.message,
+        });
+        return;
+      }
+
+      toast.warning("", {
+        description: result.message,
+      });
+
+      setIsOpen(false);
+
+      router.push("/loans");
     } catch (error) {
       console.error("Error deleting loan:", error);
-      // Handle error
+      toast.error("", {
+        description: "An error occured while deleting the loan.",
+      });
     } finally {
       setIsDeleting(false);
     }
@@ -144,7 +174,7 @@ export function LoanStatusManager({ loan }: { loan: Loan }) {
         </div>
 
         <div className="pt-4 border-t">
-          <AlertDialog>
+          <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
             <AlertDialogTrigger asChild>
               <Button
                 variant="destructive"

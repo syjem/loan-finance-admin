@@ -19,7 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getClientLoansById } from "@/app/data";
-import { formatCurrency } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import Link from "next/link";
 
 export const ClientLoansTable = async ({ clientId }: { clientId: string }) => {
@@ -79,7 +79,19 @@ export const ClientLoansTable = async ({ clientId }: { clientId: string }) => {
                       {format(loan.created_at, "MMM d, yyyy")}
                     </TableCell>
                     <TableCell className="capitalize">
-                      <Badge variant="default">{loan.status}</Badge>
+                      <Badge
+                        variant="default"
+                        className={cn(
+                          "capitalize rounded-full",
+                          loan.status === "active"
+                            ? "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100"
+                            : loan.status === "overdue"
+                            ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100"
+                            : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
+                        )}
+                      >
+                        {loan.status}
+                      </Badge>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="font-medium">{loan.term}</div>

@@ -36,65 +36,61 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { updateLoan } from "@/app/actions";
+import type { Loan } from "@/lib/types";
+import { toast } from "sonner";
 
 // Form schema
 const formSchema = z.object({
   amount: z.string().min(1, "Loan amount is required"),
   purpose: z.string().min(1, "Loan purpose is required"),
   term: z.string().min(1, "Loan term is required"),
-  interestRate: z.string().min(1, "Interest rate is required"),
-  startDate: z.date({
+  interest_rate: z.string().min(1, "Interest rate is required"),
+  created_at: z.date({
     required_error: "Start date is required",
   }),
-  creditScore: z.string().optional(),
-  annualIncome: z.string().optional(),
-  collateral: z.string().optional(),
   notes: z.string().optional(),
 });
 
-type FormValues = z.infer<typeof formSchema>;
+export type LoanEditFormValues = z.infer<typeof formSchema>;
 
-interface LoanEditFormProps {
-  loan: {
-    id: number;
-    amount: number;
-    purpose: string;
-    term: string;
-    interest_rate: number;
-    created_at: Date;
-    creditScore: number;
-    annualIncome: number;
-    collateral: string;
-    notes: string;
-  };
-}
-
-export function LoanEditForm({ loan }: LoanEditFormProps) {
+export function LoanEditForm({ loan }: { loan: Loan }) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<FormValues>({
+  const form = useForm<LoanEditFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       amount: loan.amount.toString(),
       purpose: loan.purpose,
       term: loan.term,
-      interestRate: loan.interest_rate.toString(),
-      startDate: loan.created_at,
-      collateral: loan.collateral,
+      interest_rate: loan.interest_rate.toString(),
+      created_at: new Date(loan.created_at),
       notes: loan.notes,
     },
   });
 
-  const onSubmit = async (data: FormValues) => {
+  const onSubmit = async (data: LoanEditFormValues) => {
     setIsSubmitting(true);
     try {
-      await updateLoan(loan.id, data);
-      // In a real app, you might want to show a success toast
+      const result = await updateLoan(loan.id, data);
+
+      if (!result.success) {
+        toast.error("Error", {
+          description: result.message,
+        });
+        return;
+      }
+
+      toast.success("Success", {
+        description: result.message,
+      });
+
       router.refresh();
     } catch (error) {
       console.error("Error updating loan:", error);
-      // Handle error
+      toast.error("", {
+        description: "An error occured while updating the loan.",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -125,7 +121,7 @@ export function LoanEditForm({ loan }: LoanEditFormProps) {
 
               <FormField
                 control={form.control}
-                name="interestRate"
+                name="interest_rate"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Interest Rate (%)</FormLabel>
@@ -206,7 +202,7 @@ export function LoanEditForm({ loan }: LoanEditFormProps) {
 
             <FormField
               control={form.control}
-              name="startDate"
+              name="created_at"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel>Start Date</FormLabel>
@@ -262,13 +258,6 @@ export function LoanEditForm({ loan }: LoanEditFormProps) {
             />
 
             <div className="flex justify-end gap-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => router.refresh()}
-              >
-                Cancel
-              </Button>
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>

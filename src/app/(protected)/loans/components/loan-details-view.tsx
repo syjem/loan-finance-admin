@@ -1,36 +1,13 @@
-import { format, addMonths } from "date-fns";
-import { Calendar, FileText } from "lucide-react";
+"use client";
+
+import { FileText } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getMonthlyPayment } from "@/lib/utils";
+import { formatCurrency, getMonthlyPayment } from "@/lib/utils";
+import type { Loan } from "@/lib/types";
+import { LoanDetailsTimeline } from "./loan-details-timeline";
 
-interface LoanDetailsViewProps {
-  loan: {
-    id: string;
-    clients: {
-      id: string;
-      firstName: string;
-      lastName: string;
-      email: string;
-      type: "individual" | "business";
-      phoneNumber: string;
-      companyName: string | null;
-    };
-    amount: number;
-    purpose: string;
-    term: string;
-    interest_rate: number;
-    created_at: string;
-    status: string;
-    notes: string;
-    loanOfficer: string;
-    monthlyPayment: number;
-    totalPayments: number;
-    remainingBalance: number;
-  };
-}
-
-export function LoanDetailsView({ loan }: LoanDetailsViewProps) {
+export function LoanDetailsView({ loan }: { loan: Loan }) {
   return (
     <div className="space-y-6">
       <Card>
@@ -53,13 +30,18 @@ export function LoanDetailsView({ loan }: LoanDetailsViewProps) {
                 <label className="text-sm font-medium text-muted-foreground">
                   Loan Amount
                 </label>
-                <p className="text-lg font-semibold">${loan.amount}</p>
+                <p className="text-lg font-semibold">
+                  {formatCurrency(loan.amount)}
+                </p>
               </div>
               <div>
                 <label className="text-sm font-medium text-muted-foreground">
                   Purpose
                 </label>
-                <p className="capitalize">{loan.purpose} Loan</p>
+                <p className="capitalize">
+                  {loan.purpose}
+                  {loan.purpose !== "others" && " Loan"}
+                </p>
               </div>
               <div>
                 <label className="text-sm font-medium text-muted-foreground">
@@ -80,11 +62,12 @@ export function LoanDetailsView({ loan }: LoanDetailsViewProps) {
                   Monthly Payment
                 </label>
                 <p className="text-lg font-semibold">
-                  $
-                  {getMonthlyPayment(
-                    loan.amount,
-                    loan.interest_rate,
-                    loan.term
+                  {formatCurrency(
+                    getMonthlyPayment(
+                      loan.amount,
+                      loan.interest_rate,
+                      loan.term
+                    )
                   )}
                 </p>
               </div>
@@ -113,46 +96,7 @@ export function LoanDetailsView({ loan }: LoanDetailsViewProps) {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
-            Timeline
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">
-                  Application Date
-                </label>
-                <p>{format(loan.created_at, "MMMM d, yyyy")}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">
-                  Next Payment Date
-                </label>
-                <p>{format(addMonths(loan.created_at, 1), "MMMM d, yyyy")}</p>
-              </div>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">
-                  Approval Date
-                </label>
-                <p>{format(loan.created_at, "MMMM d, yyyy")}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">
-                  Current Status
-                </label>
-                <p className="font-semibold capitalize">{loan.status}</p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <LoanDetailsTimeline loan={loan} />
 
       {loan.notes && (
         <Card>
