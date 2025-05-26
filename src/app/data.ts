@@ -134,3 +134,14 @@ export const getLoansById = async (id: number) => {
 
   return data ?? [];
 };
+
+export const getAllLoans = async () => {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("all_loan_applications")
+    .select(`*`);
+
+  if (error) return [];
+
+  return data ?? [];
+};

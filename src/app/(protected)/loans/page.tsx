@@ -1,17 +1,10 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Button } from "@/components/ui/button";
-import RecentApplicationTable from "@/components/recent-applications-table";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { getRecentLoanApplications } from "@/app/data";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import AllLoansTable from "./components/all-loans-table";
+import { getAllLoans } from "@/app/data";
 
 export const metadata: Metadata = {
   title: "Loan Applications",
@@ -19,9 +12,8 @@ export const metadata: Metadata = {
 };
 
 export default async function DealsPage() {
-  const [recentLoanApplications] = await Promise.all([
-    getRecentLoanApplications(),
-  ]);
+  const allLoans = await getAllLoans();
+
   return (
     <div className="container space-y-6">
       <header className="flex items-center justify-between">
@@ -37,17 +29,7 @@ export default async function DealsPage() {
         </Button>
       </header>
 
-      <Card className="bg-muted/50">
-        <CardHeader>
-          <CardTitle>Recent Applications</CardTitle>
-          <CardDescription>View recent loan applications</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <RecentApplicationTable
-            recentLoanApplications={recentLoanApplications}
-          />
-        </CardContent>
-      </Card>
+      <AllLoansTable loans={allLoans} />
     </div>
   );
 }
