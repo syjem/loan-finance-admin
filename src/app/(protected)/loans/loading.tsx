@@ -57,15 +57,14 @@ export default function Loading() {
             </TableCell>
             <TableCell>
               <Badge
-                // className={cn(
-                //   "text-xs capitalize rounded-full",
-                //   status === "active"
-                //     ? "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100"
-                //     : status === "overdue"
-                //     ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100"
-                //     : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
-                // )}
-                onClick={(e) => e.stopPropagation()}
+              // className={cn(
+              //   "text-xs capitalize rounded-full",
+              //   status === "active"
+              //     ? "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100"
+              //     : status === "overdue"
+              //     ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100"
+              //     : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
+              // )}
               ></Badge>
             </TableCell>
           </TableRow>
