@@ -1,5 +1,6 @@
 "use server";
 
+import { format } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
 
 export const getClients = async () => {
@@ -139,9 +140,96 @@ export const getAllLoans = async () => {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("all_loan_applications")
-    .select(`*`);
+    .select(`*`)
+    .limit(10);
 
   if (error) return [];
 
   return data ?? [];
+};
+
+export const getLoanStatusPercentage = async () => {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("loans").select("status");
+
+  if (error) {
+    console.error("Error fetching loans:", error);
+    return [];
+  }
+
+  const counts: Record<string, number> = {};
+
+  for (const loan of data) {
+    const status = loan.status || "Unknown";
+    counts[status] = (counts[status] || 0) + 1;
+  }
+
+  const colorMap: Record<string, string> = {
+    active: "oklch(49.6% 0.265 301.924)",
+    overdue: "oklch(68.1% 0.162 75.834)",
+    completed: "oklch(62.7% 0.194 149.214)",
+  };
+
+  return Object.entries(counts).map(([status, value]) => ({
+    name: status,
+    value,
+    color: colorMap[status] || "#ccc",
+  }));
+};
+
+export const getLoanMonthlyStats = async () => {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("loans")
+    .select("created_at, status");
+
+  if (error) return [];
+
+  const monthlyStats: Record<
+    string,
+    { active: number; overdue: number; completed: number }
+  > = {};
+
+  for (const loan of data) {
+    if (!loan.created_at || !loan.status) continue;
+
+    // Convert date to month name (e.g. Jan, Feb)
+    const month = format(new Date(loan.created_at), "MMM");
+
+    // Initialize month if not exists
+    if (!monthlyStats[month]) {
+      monthlyStats[month] = { active: 0, overdue: 0, completed: 0 };
+    }
+
+    // Add count to the correct status
+    const status = loan.status.toLowerCase();
+    if (status in monthlyStats[month]) {
+      monthlyStats[month][status as "active" | "overdue" | "completed"]++;
+    }
+  }
+
+  // Format the result
+  const orderedMonths = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  const result = orderedMonths
+    .filter((month) => monthlyStats[month])
+    .map((month) => ({
+      name: month,
+      ...monthlyStats[month],
+    }));
+
+  return result;
 };

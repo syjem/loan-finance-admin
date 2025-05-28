@@ -21,6 +21,8 @@ import {
   getLoanStats,
   getClientsTotalValue,
   getRecentLoanApplications,
+  getLoanStatusPercentage,
+  getLoanMonthlyStats,
 } from "@/app/data";
 
 export const metadata: Metadata = {
@@ -28,13 +30,21 @@ export const metadata: Metadata = {
 };
 
 export default async function Dashboard() {
-  const [numberOfClients, stats, clientsTotalValue, recentLoanApplications] =
-    await Promise.all([
-      getTotalNumberOfClients(),
-      getLoanStats(),
-      getClientsTotalValue(),
-      getRecentLoanApplications(),
-    ]);
+  const [
+    numberOfClients,
+    stats,
+    clientsTotalValue,
+    recentLoanApplications,
+    loanStatusStats,
+    loanMonthlyStats,
+  ] = await Promise.all([
+    getTotalNumberOfClients(),
+    getLoanStats(),
+    getClientsTotalValue(),
+    getRecentLoanApplications(),
+    getLoanStatusPercentage(),
+    getLoanMonthlyStats(),
+  ]);
 
   return (
     <React.Fragment>
@@ -62,18 +72,18 @@ export default async function Dashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <MonthlyDealsChart />
+              <MonthlyDealsChart stats={loanMonthlyStats} />
             </CardContent>
           </Card>
           <Card className="lg:col-span-3 bg-muted/50">
             <CardHeader>
-              <CardTitle>Deal Status</CardTitle>
+              <CardTitle>Loan Status Overview</CardTitle>
               <CardDescription>
                 Distribution of loan applications by status
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <DealStatusChart />
+              <DealStatusChart stats={loanStatusStats} />
             </CardContent>
           </Card>
         </div>

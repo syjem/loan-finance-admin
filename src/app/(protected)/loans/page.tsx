@@ -11,8 +11,25 @@ export const metadata: Metadata = {
   description: "Manage loan applications",
 };
 
-export default async function DealsPage() {
+export default async function DealsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ query: string; status: string }>;
+}) {
   const allLoans = await getAllLoans();
+  const query = (await searchParams).query || "";
+  const status = (await searchParams).status || "all";
+
+  const filteredLoans = allLoans.filter((loan) => {
+    const filterByQuery =
+      query === "" ||
+      loan.firstName.toLowerCase().includes(query.toLowerCase()) ||
+      loan.lastName.toLowerCase().includes(query.toLowerCase());
+
+    const filterByStatus = status || loan.status === status;
+
+    return filterByQuery && filterByStatus;
+  });
 
   return (
     <div className="container space-y-6">
@@ -29,7 +46,7 @@ export default async function DealsPage() {
         </Button>
       </header>
 
-      <AllLoansTable loans={allLoans} />
+      <AllLoansTable loans={filteredLoans} query={query} status={status} />
     </div>
   );
 }

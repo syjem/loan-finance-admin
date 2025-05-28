@@ -6,17 +6,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CalendarIcon } from "lucide-react";
-// import { cn } from "@/lib/utils";
 
 export default function Loading() {
   return (
     <div className="space-y-4">
-      {/* Results summary */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground"></p>
         <Button variant="outline" size="sm">
@@ -24,7 +21,6 @@ export default function Loading() {
         </Button>
       </div>
 
-      {/* Table */}
       <Table className="rounded-md">
         <TableHeader>
           <TableRow>
@@ -55,18 +51,7 @@ export default function Loading() {
                 <span></span>
               </div>
             </TableCell>
-            <TableCell>
-              <Badge
-              // className={cn(
-              //   "text-xs capitalize rounded-full",
-              //   status === "active"
-              //     ? "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100"
-              //     : status === "overdue"
-              //     ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100"
-              //     : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
-              // )}
-              ></Badge>
-            </TableCell>
+            <TableCell></TableCell>
           </TableRow>
         </TableBody>
       </Table>

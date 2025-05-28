@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { CalendarIcon, FileText } from "lucide-react";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
@@ -14,7 +14,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { AllLoans } from "./all-loans-table";
 import { cn, formatCurrency, getInitials } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -31,7 +30,6 @@ export function FilterableDealsTable({
   loans,
 }: FilterableDealsTableProps) {
   const router = useRouter();
-  const [showAll, setShowAll] = useState(false);
 
   // Filter the deals based on search term and status
   const filteredLoans = useMemo(() => {
@@ -48,40 +46,12 @@ export function FilterableDealsTable({
     });
   }, [searchTerm, statusFilter, loans]);
 
-  // Determine which deals to show (first 10 or all)
-  const loansToShow = showAll ? filteredLoans : filteredLoans.slice(0, 10);
-  const hasMoreLoans = filteredLoans.length > 10;
-
   const handleRowClick = (loanId: string) => {
     router.push(`/loans/details?id=${loanId}`);
   };
 
-  const handleViewMore = () => {
-    setShowAll(true);
-  };
-
-  const handleShowLess = () => {
-    setShowAll(false);
-  };
-
   return (
     <div className="space-y-4">
-      {/* Results summary */}
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          Showing {loansToShow.length} of {filteredLoans.length} loan
-          applications
-          {(searchTerm || statusFilter !== "all") && (
-            <span className="ml-1">(filtered from {loans.length} total)</span>
-          )}
-        </p>
-        {showAll && hasMoreLoans && (
-          <Button variant="outline" size="sm" onClick={handleShowLess}>
-            Show Less
-          </Button>
-        )}
-      </div>
-
       {/* Table */}
       <Table className="rounded-md">
         <TableHeader>
@@ -95,7 +65,7 @@ export function FilterableDealsTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {loansToShow.length === 0 ? (
+          {filteredLoans.length === 0 ? (
             <TableRow>
               <TableCell colSpan={7} className="h-24 text-center">
                 <div className="flex flex-col items-center gap-2">
@@ -109,7 +79,7 @@ export function FilterableDealsTable({
               </TableCell>
             </TableRow>
           ) : (
-            loansToShow.map((loan) => (
+            filteredLoans.map((loan) => (
               <TableRow
                 key={loan.id}
                 onClick={() => handleRowClick(loan.id)}
@@ -162,15 +132,6 @@ export function FilterableDealsTable({
           )}
         </TableBody>
       </Table>
-
-      {/* View More/Less Button */}
-      {hasMoreLoans && !showAll && (
-        <div className="flex justify-center pt-4">
-          <Button variant="outline" onClick={handleViewMore}>
-            View More ({filteredLoans.length - 10} more applications)
-          </Button>
-        </div>
-      )}
 
       {/* Filter summary */}
       {(searchTerm || statusFilter !== "all") && (

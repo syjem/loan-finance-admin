@@ -7,39 +7,32 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-const data = [
-  { name: "Approved", value: 45, color: "#10b981" },
-  { name: "Pending", value: 30, color: "#f59e0b" },
-  { name: "Under Review", value: 15, color: "#3b82f6" },
-  { name: "Rejected", value: 10, color: "#ef4444" },
-];
+type Stats = {
+  name: string;
+  value: number;
+  color: string;
+};
 
-export function DealStatusChart() {
+export function DealStatusChart({ stats }: { stats: Stats[] }) {
   return (
     <ChartContainer
       config={{
-        approved: {
-          label: "Approved",
-          color: "#10b981",
+        active: {
+          label: "Active",
         },
-        pending: {
-          label: "Pending",
-          color: "#f59e0b",
+        overdue: {
+          label: "Overdue",
         },
-        review: {
-          label: "Under Review",
-          color: "#3b82f6",
-        },
-        rejected: {
-          label: "Rejected",
-          color: "#ef4444",
+        completed: {
+          label: "Completed",
         },
       }}
     >
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
-            data={data}
+            className="capitalize"
+            data={stats}
             cx="50%"
             cy="50%"
             innerRadius={60}
@@ -51,7 +44,7 @@ export function DealStatusChart() {
             }
             labelLine={false}
           >
-            {data.map((entry, index) => (
+            {stats.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.color} />
             ))}
           </Pie>

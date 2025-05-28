@@ -44,7 +44,7 @@ const OverviewCards = ({ numberOfClients, initialStats }: Props) => {
         description="+5.2% from last month"
       />
       <CustomCard
-        title="Approval Rate"
+        title="Revenue This Month"
         value={78.5}
         type="approvalRate"
         description="+2.1% from last month"

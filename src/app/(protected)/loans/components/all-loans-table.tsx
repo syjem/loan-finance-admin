@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { FilterableDealsTable } from "./filterable-loans-table";
+import { useRouter } from "next/navigation";
 
 export type AllLoans = {
   id: string;
@@ -32,9 +33,73 @@ export type AllLoans = {
   avatar: string;
 }[];
 
-const AllLoansTable = ({ loans }: { loans: AllLoans }) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+const AllLoansTable = ({
+  loans,
+  query,
+  status,
+}: {
+  loans: AllLoans;
+  query: string;
+  status: string;
+}) => {
+  const [searchTerm, setSearchTerm] = useState(query);
+  const [statusFilter, setStatusFilter] = useState(status);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (query) {
+      setSearchTerm(query);
+    }
+  }, [query]);
+
+  useEffect(() => {
+    if (status) {
+      setStatusFilter(status);
+    }
+  }, [status]);
+
+  const handleSearchClient = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+
+    const search = new URLSearchParams(window.location.search);
+
+    if (value.trim() === "") {
+      search.delete("query");
+    } else {
+      search.set("query", value);
+    }
+
+    const queryString = search.toString();
+    router.push(`/loans${queryString ? `?${queryString}` : ""}`);
+  };
+
+  const handleChangeFilter = (value: string) => {
+    setStatusFilter(value);
+
+    const search = new URLSearchParams(window.location.search);
+    if (value === "all") {
+      search.delete("status");
+    } else {
+      search.set("status", value);
+    }
+
+    // Preserve existing `query` param (if any)
+    const query = search.toString();
+    router.push(`/loans${query ? `?${query}` : ""}`);
+  };
+
+  const handleClearFilters = () => {
+    const search = new URLSearchParams(window.location.search);
+    search.delete("query");
+    search.delete("status");
+    setSearchTerm("");
+    setStatusFilter("all");
+
+    const queryString = search.toString();
+    router.push(`/loans${queryString ? `?${queryString}` : ""}`);
+  };
+
   return (
     <>
       <Card className="mb-4 bg-muted/50">
@@ -62,7 +127,7 @@ const AllLoansTable = ({ loans }: { loans: AllLoans }) => {
                   placeholder="Search client names..."
                   className="pl-8"
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={handleSearchClient}
                 />
               </div>
             </div>
@@ -74,7 +139,7 @@ const AllLoansTable = ({ loans }: { loans: AllLoans }) => {
                 >
                   Filter by Status
                 </Label>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <Select value={statusFilter} onValueChange={handleChangeFilter}>
                   <SelectTrigger id="status-filter">
                     <SelectValue placeholder="All Status" />
                   </SelectTrigger>
@@ -86,13 +151,7 @@ const AllLoansTable = ({ loans }: { loans: AllLoans }) => {
                   </SelectContent>
                 </Select>
               </div>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setSearchTerm("");
-                  setStatusFilter("all");
-                }}
-              >
+              <Button variant="outline" onClick={handleClearFilters}>
                 Clear Filters
               </Button>
             </div>
