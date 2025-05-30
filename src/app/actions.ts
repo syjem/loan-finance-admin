@@ -153,3 +153,56 @@ export async function deleteLoan(id: number) {
     message: "Loan deleted successfully",
   };
 }
+
+export async function createLoanOfficer(data: any) {
+  // Simulate API delay
+  await new Promise((resolve) => setTimeout(resolve, 1500));
+
+  // Log the data (in a real app, you would save to database)
+  console.log("Loan officer created:", data);
+
+  // Return a success response
+  return {
+    success: true,
+    message: "Loan officer created successfully",
+    data: {
+      id: `OFFICER-${Math.floor(Math.random() * 10000)}`,
+      ...data,
+    },
+  };
+}
+
+export async function updateLoanOfficer(officerId: string, data: any) {
+  // Simulate API delay
+  await new Promise((resolve) => setTimeout(resolve, 1500));
+
+  // Log the update (in a real app, you would update the database)
+  console.log(`Loan officer ${officerId} updated:`, data);
+
+  // Return a success response
+  return {
+    success: true,
+    message: "Loan officer updated successfully",
+    data: {
+      officerId,
+      ...data,
+    },
+  };
+}
+
+export async function deleteLoanOfficer(officerId: string) {
+  // Simulate API delay
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  // Log the deletion (in a real app, you would delete from database)
+  console.log(`Loan officer ${officerId} deleted`);
+
+  // Return a success response
+  return {
+    success: true,
+    message: "Loan officer deleted successfully",
+    data: {
+      officerId,
+    },
+  };
+}
