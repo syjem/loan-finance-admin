@@ -45,7 +45,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { deleteLoanOfficer } from "@/app/actions";
+import { deleteLoanOfficer } from "@/app/actions/admin";
 
 // Sample loan officers data
 const loanOfficers = [
@@ -178,7 +178,6 @@ export function LoanOfficersTable() {
               <TableHead>Officer</TableHead>
               <TableHead className="hidden md:table-cell">Contact</TableHead>
               <TableHead>Role</TableHead>
-              <TableHead>Status</TableHead>
               <TableHead className="hidden lg:table-cell">
                 Performance
               </TableHead>
@@ -247,9 +246,6 @@ export function LoanOfficersTable() {
                           : "Officer"}
                       </span>
                     </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge>{officer.status}</Badge>
                   </TableCell>
                   <TableCell className="hidden lg:table-cell">
                     <div>

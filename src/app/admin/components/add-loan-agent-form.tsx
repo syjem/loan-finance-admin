@@ -5,18 +5,16 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Loader2, ArrowLeft, CalendarIcon } from "lucide-react";
+import { Loader2, ArrowLeft, CalendarIcon, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -35,53 +33,28 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { createLoanOfficer } from "@/app/actions";
+import { createLoanOfficer } from "@/app/actions/admin";
 import { cn } from "@/lib/utils";
+import { addLoanAgentFormSchema } from "@/lib/schema";
 
-// Form schema
-const formSchema = z.object({
-  firstName: z.string().min(2, {
-    message: "First name must be at least 2 characters.",
-  }),
-  lastName: z.string().min(2, {
-    message: "Last name must be at least 2 characters.",
-  }),
-  email: z.string().email({
-    message: "Please enter a valid email address.",
-  }),
-  phone: z.string().min(10, {
-    message: "Phone number must be at least 10 digits.",
-  }),
-  role: z.string({
-    required_error: "Please select a role.",
-  }),
-  department: z.string().optional(),
-  employeeId: z.string().min(3, {
-    message: "Employee ID must be at least 3 characters.",
-  }),
-  startDate: z.date({
-    required_error: "Start date is required.",
-  }),
-  notes: z.string().optional(),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = z.infer<typeof addLoanAgentFormSchema>;
 
 export function AddLoanAgentForm() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(addLoanAgentFormSchema),
     defaultValues: {
       firstName: "",
       lastName: "",
       email: "",
+      password: "",
+      confirmPassword: "",
       phone: "",
-      department: "",
-      employeeId: "",
       startDate: new Date(),
-      notes: "",
     },
   });
 
@@ -185,17 +158,17 @@ export function AddLoanAgentForm() {
                 <div className="grid gap-4 md:grid-cols-2">
                   <FormField
                     control={form.control}
-                    name="role"
+                    name="position"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Role</FormLabel>
+                        <FormLabel>Position</FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                         >
                           <FormControl>
                             <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Select role" />
+                              <SelectValue placeholder="Select a position" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -210,39 +183,6 @@ export function AddLoanAgentForm() {
                             </SelectItem>
                           </SelectContent>
                         </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="department"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Department (Optional)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Lending Department" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <FormField
-                    control={form.control}
-                    name="employeeId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Employee ID</FormLabel>
-                        <FormControl>
-                          <Input placeholder="EMP001" {...field} />
-                        </FormControl>
-                        <FormDescription>
-                          Unique identifier for the employee
-                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -290,27 +230,77 @@ export function AddLoanAgentForm() {
               </div>
 
               <div className="space-y-4">
-                <div className="text-xl font-semibold">
-                  Additional Information
-                </div>
+                <div className="text-xl font-semibold">Login Credentials</div>
 
-                <FormField
-                  control={form.control}
-                  name="notes"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Notes (Optional)</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Any additional information about this loan officer..."
-                          className="min-h-[100px]"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="grid gap-4 md:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Input
+                              type={showPassword ? "text" : "password"}
+                              placeholder="********"
+                              {...field}
+                            />
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              type="button"
+                              onClick={() => setShowPassword((prev) => !prev)}
+                              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-sm text-gray-500 focus:outline-none"
+                            >
+                              {showPassword ? (
+                                <EyeOff size={18} />
+                              ) : (
+                                <Eye size={18} />
+                              )}
+                            </Button>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Confirm Password</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Input
+                              type={showConfirmPassword ? "text" : "password"}
+                              placeholder="********"
+                              {...field}
+                            />
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              type="button"
+                              onClick={() =>
+                                setShowConfirmPassword((prev) => !prev)
+                              }
+                              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-sm text-gray-500 focus:outline-none"
+                            >
+                              {showConfirmPassword ? (
+                                <EyeOff size={18} />
+                              ) : (
+                                <Eye size={18} />
+                              )}
+                            </Button>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
 
               <div className="flex justify-end gap-4">
@@ -328,7 +318,7 @@ export function AddLoanAgentForm() {
                       Creating...
                     </>
                   ) : (
-                    "Create Loan Officer"
+                    "Create Loan Agent"
                   )}
                 </Button>
               </div>

@@ -11,9 +11,9 @@ export default function AddOfficerPage() {
     <div className="min-h-screen">
       <div className="container max-w-4xl py-6 mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold">Add New Loan Officer</h1>
+          <h1 className="text-3xl font-bold">Add New Loan Agent</h1>
           <p className="text-muted-foreground">
-            Create a new loan officer account
+            Create a new loan agent account
           </p>
         </div>
         <AddLoanAgentForm />

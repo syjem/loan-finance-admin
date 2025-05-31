@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   description: "Manage loan officers and agents in the system",
 };
 
-export default function AdminPage() {
+export default async function AdminPage() {
   return (
     <div>
       {/* Header */}

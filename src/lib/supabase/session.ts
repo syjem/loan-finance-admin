@@ -4,10 +4,17 @@ export const getCurrentUser = async () => {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getUser();
 
-  if (error) {
-    console.error("Error fetching user:", error.message);
+  if (error || !data.user) {
+    console.error("Error fetching user:", error?.message || "No user");
     return null;
   }
 
-  return data.user;
+  const user = data.user;
+
+  const isAdmin = user.user_metadata?.role === "admin";
+
+  return {
+    ...user,
+    isAdmin,
+  };
 };
