@@ -100,6 +100,10 @@ export const addLoanAgentFormSchema = z
     confirmPassword: z.string().min(6, {
       message: "Password must be at least 6 characters.",
     }),
+    role: z.enum(["admin", "agent"], {
+      required_error: "Please select a role.",
+      invalid_type_error: "Invalid role selected.",
+    }),
     phone: z.string().min(10, {
       message: "Phone number must be at least 10 digits.",
     }),

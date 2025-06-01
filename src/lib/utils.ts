@@ -63,3 +63,10 @@ export const getMonthlyPayment = (
       throw new Error(`Unknown term: ${term}`);
   }
 };
+
+export const toE164 = (phone: string): string => {
+  if (phone.startsWith("0")) {
+    return "+63" + phone.slice(1);
+  }
+  return phone;
+};

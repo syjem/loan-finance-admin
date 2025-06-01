@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
+import type { User as UserType } from "@supabase/supabase-js";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,82 +47,29 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { deleteLoanOfficer } from "@/app/actions/admin";
+import { getInitials } from "@/lib/utils";
 
-// Sample loan officers data
-const loanOfficers = [
-  {
-    id: "1",
-    name: "Sarah Thompson",
-    email: "sarah.thompson@lendingadmin.com",
-    phone: "(555) 123-4567",
-    role: "Senior Loan Officer",
-    status: "Active",
-    joinDate: new Date("2022-01-15"),
-    totalLoans: 45,
-    approvalRate: 78.5,
-    initials: "ST",
-  },
-  {
-    id: "2",
-    name: "Michael Chen",
-    email: "michael.chen@lendingadmin.com",
-    phone: "(555) 234-5678",
-    role: "Loan Officer",
-    status: "Active",
-    joinDate: new Date("2022-03-20"),
-    totalLoans: 32,
-    approvalRate: 82.1,
-    initials: "MC",
-  },
-  {
-    id: "3",
-    name: "Emily Rodriguez",
-    email: "emily.rodriguez@lendingadmin.com",
-    phone: "(555) 345-6789",
-    role: "Junior Loan Officer",
-    status: "Active",
-    joinDate: new Date("2023-01-10"),
-    totalLoans: 18,
-    approvalRate: 75.0,
-    initials: "ER",
-  },
-  {
-    id: "4",
-    name: "David Wilson",
-    email: "david.wilson@lendingadmin.com",
-    phone: "(555) 456-7890",
-    role: "Loan Officer",
-    status: "Inactive",
-    joinDate: new Date("2021-11-05"),
-    totalLoans: 67,
-    approvalRate: 80.2,
-    initials: "DW",
-  },
-  {
-    id: "5",
-    name: "Jessica Park",
-    email: "jessica.park@lendingadmin.com",
-    phone: "(555) 567-8901",
-    role: "Senior Loan Officer",
-    status: "Active",
-    joinDate: new Date("2021-08-12"),
-    totalLoans: 89,
-    approvalRate: 85.3,
-    initials: "JP",
-  },
-];
+export function LoanOfficersTable({ loanAgents }: { loanAgents: UserType[] }) {
+  const agents = loanAgents.map((agent) => ({
+    id: agent.id,
+    email: agent.email,
+    phone: agent.phone,
+    fullName: agent.user_metadata.full_name,
+    position: agent.user_metadata.position,
+    start_date: agent.user_metadata.start_date,
+    avatar_url: agent.user_metadata.avatar_url,
+  }));
 
-export function LoanOfficersTable() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
   // Filter officers based on search term
-  const filteredOfficers = loanOfficers.filter(
-    (officer) =>
-      officer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      officer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      officer.role.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredOfficers = agents.filter(
+    (agent) =>
+      agent.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      agent.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      agent.position?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleEdit = (officerId: string) => {
@@ -145,12 +93,6 @@ export function LoanOfficersTable() {
     return <User className="h-3 w-3" />;
   };
 
-  const getRoleBadgeVariant = (role: string) => {
-    if (role.includes("Senior")) return "default";
-    if (role.includes("Junior")) return "secondary";
-    return "outline";
-  };
-
   return (
     <div className="space-y-4">
       {/* Search */}
@@ -165,9 +107,6 @@ export function LoanOfficersTable() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="text-sm text-muted-foreground">
-          {filteredOfficers.length} of {loanOfficers.length} officers
-        </div>
       </div>
 
       {/* Table */}
@@ -177,7 +116,7 @@ export function LoanOfficersTable() {
             <TableRow>
               <TableHead>Officer</TableHead>
               <TableHead className="hidden md:table-cell">Contact</TableHead>
-              <TableHead>Role</TableHead>
+              <TableHead>Position</TableHead>
               <TableHead className="hidden lg:table-cell">
                 Performance
               </TableHead>
@@ -200,21 +139,23 @@ export function LoanOfficersTable() {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredOfficers.map((officer) => (
-                <TableRow key={officer.id}>
+              filteredOfficers.map((agent) => (
+                <TableRow key={agent.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar className="h-9 w-9">
                         <AvatarImage
-                          src={`/placeholder.svg?height=36&width=36`}
-                          alt={officer.name}
+                          src={agent.avatar_url}
+                          alt={agent.fullName}
                         />
-                        <AvatarFallback>{officer.initials}</AvatarFallback>
+                        <AvatarFallback>
+                          {getInitials(agent.fullName)}
+                        </AvatarFallback>
                       </Avatar>
                       <div>
-                        <div className="font-medium">{officer.name}</div>
+                        <div className="font-medium">{agent.fullName}</div>
                         <div className="text-sm text-muted-foreground md:hidden">
-                          {officer.email}
+                          {agent.email}
                         </div>
                       </div>
                     </div>
@@ -223,43 +164,35 @@ export function LoanOfficersTable() {
                     <div className="flex flex-col">
                       <div className="flex items-center gap-1">
                         <Mail className="h-3 w-3 text-muted-foreground" />
-                        <span className="text-sm">{officer.email}</span>
+                        <span className="text-sm">{agent.email}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Phone className="h-3 w-3 text-muted-foreground" />
-                        <span className="text-sm">{officer.phone}</span>
+                        <span className="text-sm">+{agent.phone}</span>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge
-                      variant={getRoleBadgeVariant(officer.role)}
-                      className="flex items-center gap-1 w-fit"
-                    >
-                      {getRoleIcon(officer.role)}
-                      <span className="hidden sm:inline">{officer.role}</span>
-                      <span className="sm:hidden">
-                        {officer.role.includes("Senior")
-                          ? "Senior"
-                          : officer.role.includes("Junior")
-                          ? "Junior"
-                          : "Officer"}
-                      </span>
+                    <Badge className="flex items-center gap-1 w-fit">
+                      {getRoleIcon(agent.position)}
+                      <span className="hidden sm:inline">{agent.position}</span>
+                      <span className="sm:hidden">{agent.position}</span>
                     </Badge>
                   </TableCell>
                   <TableCell className="hidden lg:table-cell">
-                    <div>
+                    {/* <div>
                       <div className="text-sm font-medium">
-                        {officer.totalLoans} loans
+                        {agent.totalLoans} loans
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        {officer.approvalRate}% approval
+                        {agent.approvalRate}% approval
                       </div>
-                    </div>
+                    </div> */}
+                    (Number of loans here)
                   </TableCell>
                   <TableCell className="hidden lg:table-cell">
                     <div className="text-sm">
-                      {format(officer.joinDate, "MMM d, yyyy")}
+                      {format(agent.start_date, "MMM d, yyyy")}
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
@@ -276,9 +209,7 @@ export function LoanOfficersTable() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem
-                          onClick={() => handleEdit(officer.id)}
-                        >
+                        <DropdownMenuItem onClick={() => handleEdit(agent.id)}>
                           <Edit className="mr-2 h-4 w-4" />
                           Edit Officer
                         </DropdownMenuItem>
@@ -300,18 +231,18 @@ export function LoanOfficersTable() {
                               </AlertDialogTitle>
                               <AlertDialogDescription>
                                 This action cannot be undone. This will
-                                permanently delete {officer.name}&apos;s account
-                                and remove all associated data.
+                                permanently delete {agent.fullName}&apos;s
+                                account and remove all associated data.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                               <AlertDialogCancel>Cancel</AlertDialogCancel>
                               <AlertDialogAction
-                                onClick={() => handleDelete(officer.id)}
-                                disabled={isDeleting === officer.id}
+                                onClick={() => handleDelete(agent.id)}
+                                disabled={isDeleting === agent.id}
                                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                               >
-                                {isDeleting === officer.id
+                                {isDeleting === agent.id
                                   ? "Deleting..."
                                   : "Delete Officer"}
                               </AlertDialogAction>

@@ -79,6 +79,7 @@ export async function AppSidebar() {
               name: user?.user_metadata.full_name,
               email: user?.email ?? "",
               avatar: user?.user_metadata.avatar_url,
+              isAdmin: user?.isAdmin,
             }}
           />
         )}

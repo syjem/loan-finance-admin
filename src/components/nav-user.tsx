@@ -1,6 +1,6 @@
 "use client";
 
-import { BadgeCheck, ChevronsUpDown, LogOut } from "lucide-react";
+import { Shield, ChevronsUpDown, LogOut } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -21,6 +21,7 @@ import {
 import { getInitials } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import React from "react";
 
 export function NavUser({
   user,
@@ -29,6 +30,7 @@ export function NavUser({
     name: string;
     email: string;
     avatar: string;
+    isAdmin: boolean;
   };
 }) {
   const { isMobile } = useSidebar();
@@ -51,9 +53,9 @@ export function NavUser({
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                {/* <AvatarFallback className="rounded-lg">
+                <AvatarFallback className="rounded-lg">
                   {getInitials(user.name)}
-                </AvatarFallback> */}
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{user.name}</span>
@@ -72,9 +74,9 @@ export function NavUser({
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  {/* <AvatarFallback className="rounded-lg">
+                  <AvatarFallback className="rounded-lg">
                     {getInitials(user.name)}
-                  </AvatarFallback> */}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">{user.name}</span>
@@ -83,13 +85,17 @@ export function NavUser({
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => router.push("/admin")}>
-                <BadgeCheck />
-                Admins
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
+            {user.isAdmin && (
+              <React.Fragment>
+                <DropdownMenuGroup>
+                  <DropdownMenuItem onClick={() => router.push("/admin")}>
+                    <Shield />
+                    Admin
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+              </React.Fragment>
+            )}
             <DropdownMenuItem onClick={logout}>
               <LogOut />
               Log out

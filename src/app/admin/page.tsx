@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { LoanOfficersTable } from "./components/loan-officers-table";
 import { AdminStats } from "./components/admin-stats";
+import { listAllAgents } from "./data";
 
 export const metadata: Metadata = {
   title: "Admin Dashboard - Manage Loan Officers",
@@ -19,6 +20,8 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminPage() {
+  const loanAgents = await listAllAgents();
+
   return (
     <div>
       {/* Header */}
@@ -60,7 +63,7 @@ export default async function AdminPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <LoanOfficersTable />
+            <LoanOfficersTable loanAgents={loanAgents ?? []} />
           </CardContent>
         </Card>
       </div>

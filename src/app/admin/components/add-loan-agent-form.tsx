@@ -36,12 +36,12 @@ import { Calendar } from "@/components/ui/calendar";
 import { createLoanOfficer } from "@/app/actions/admin";
 import { cn } from "@/lib/utils";
 import { addLoanAgentFormSchema } from "@/lib/schema";
+import { toast } from "sonner";
 
 type FormValues = z.infer<typeof addLoanAgentFormSchema>;
 
 export function AddLoanAgentForm() {
   const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -53,20 +53,29 @@ export function AddLoanAgentForm() {
       email: "",
       password: "",
       confirmPassword: "",
+      role: "agent",
       phone: "",
       startDate: new Date(),
     },
   });
 
   const onSubmit = async (data: FormValues) => {
-    setIsSubmitting(true);
     try {
-      await createLoanOfficer(data);
-      router.push("/admin?success=true");
+      const result = await createLoanOfficer(data);
+
+      if (!result.success) {
+        toast.error("Submission failed", {
+          description: result.message,
+        });
+        return;
+      }
+
+      router.push("/admin");
+      toast.success("Success!", {
+        description: result.message,
+      });
     } catch (error) {
       console.error("Error creating officer:", error);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -235,6 +244,30 @@ export function AddLoanAgentForm() {
                 <div className="grid gap-4 md:grid-cols-2">
                   <FormField
                     control={form.control}
+                    name="role"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Role</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Select role" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="agent">Agent</SelectItem>
+                            <SelectItem value="admin">Admin</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
                     name="password"
                     render={({ field }) => (
                       <FormItem>
@@ -311,8 +344,8 @@ export function AddLoanAgentForm() {
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? (
+                <Button type="submit" disabled={form.formState.isSubmitting}>
+                  {form.formState.isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Creating...

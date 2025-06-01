@@ -2,6 +2,7 @@
 
 import { addLoanAgentFormSchema } from "@/lib/schema";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { toE164 } from "@/lib/utils";
 import { z } from "zod";
 
 export async function createLoanOfficer(
@@ -10,14 +11,18 @@ export async function createLoanOfficer(
   const supabase = await createAdminClient();
 
   const fullName = `${formData.firstName} ${formData.lastName}`;
+  const user = formData.role === "agent" ? "Agent" : "Admin";
 
-  const { data, error } = await supabase.auth.admin.createUser({
+  const { error } = await supabase.auth.admin.createUser({
     email: formData.email,
     password: formData.password,
-    phone: formData.phone,
+    phone: toE164(formData.phone),
+    email_confirm: true,
+    phone_confirm: true,
     user_metadata: {
       full_name: fullName,
-      role: "admin",
+      role: formData.role,
+      totalLoan: 0,
       position: formData.position,
       start_date: formData.startDate,
       avatar_url: `https://ui-avatars.com/api/?name=${encodeURIComponent(
@@ -31,16 +36,14 @@ export async function createLoanOfficer(
     return {
       success: false,
       message:
-        error.message || "An error has occured while adding the loan officer.",
+        error.message || `An error has occured while adding the ${user}.`,
     };
   }
-
-  console.log("User created:", data);
 
   // Return a success response
   return {
     success: true,
-    message: "Loan officer created successfully",
+    message: `${user} created successfully`,
   };
 }
 

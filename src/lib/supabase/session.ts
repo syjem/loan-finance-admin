@@ -12,9 +12,11 @@ export const getCurrentUser = async () => {
   const user = data.user;
 
   const isAdmin = user.user_metadata?.role === "admin";
+  const isAgent = user.user_metadata?.role === "agent";
 
   return {
     ...user,
     isAdmin,
+    isAgent,
   };
 };
