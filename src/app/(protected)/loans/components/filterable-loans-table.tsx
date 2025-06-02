@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 import { CalendarIcon, FileText } from "lucide-react";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
@@ -32,8 +31,8 @@ export function FilterableDealsTable({
   const router = useRouter();
 
   // Filter the deals based on search term and status
-  const filteredLoans = useMemo(() => {
-    return loans.filter((loan) => {
+  const filteredLoans = loans
+    .filter((loan) => {
       const matchesSearch =
         searchTerm === "" ||
         loan.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -43,10 +42,10 @@ export function FilterableDealsTable({
         statusFilter === "all" || loan.status === statusFilter;
 
       return matchesSearch && matchesStatus;
-    });
-  }, [searchTerm, statusFilter, loans]);
+    })
+    .sort((a, b) => b.id - a.id);
 
-  const handleRowClick = (loanId: string) => {
+  const handleRowClick = (loanId: number) => {
     router.push(`/loans/details?id=${loanId}`);
   };
 
@@ -135,7 +134,7 @@ export function FilterableDealsTable({
 
       {/* Filter summary */}
       {(searchTerm || statusFilter !== "all") && (
-        <div className="flex flex-wrap gap-2 pt-4 border-t">
+        <div className="flex flex-wrap shrink-0 gap-2 pt-4 border-t">
           <span className="text-sm text-muted-foreground">Active filters:</span>
           {searchTerm && (
             <Badge variant="outline" className="text-xs">
@@ -145,6 +144,11 @@ export function FilterableDealsTable({
           {statusFilter !== "all" && (
             <Badge variant="outline" className="text-xs capitalize">
               Status: {statusFilter}
+            </Badge>
+          )}
+          {filteredLoans.length > 0 && (
+            <Badge variant="outline" className="text-xs">
+              Total: {filteredLoans.length}
             </Badge>
           )}
         </div>

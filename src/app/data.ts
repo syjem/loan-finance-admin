@@ -140,8 +140,7 @@ export const getAllLoans = async () => {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("all_loan_applications")
-    .select(`*`)
-    .limit(10);
+    .select(`*`);
 
   if (error) return [];
 

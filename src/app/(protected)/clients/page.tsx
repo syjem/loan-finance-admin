@@ -19,7 +19,11 @@ export const metadata: Metadata = {
   description: "Manage client information and loan history",
 };
 
-const ClientsPage = async () => {
+const ClientsPage = async ({
+  searchParams,
+}: {
+  searchParams: Promise<{ q: string; status: string; type: string }>;
+}) => {
   const [
     clients,
     totalNumberOfClients,
@@ -33,6 +37,10 @@ const ClientsPage = async () => {
     getBusinessClients(),
     getClientsThisMonth(),
   ]);
+
+  const q = (await searchParams).q || "";
+  const status = (await searchParams).status || "all";
+  const type = (await searchParams).type || "all";
 
   return (
     <div className="container space-y-6">
@@ -55,7 +63,7 @@ const ClientsPage = async () => {
           businessClients={totalBusinessClients}
           totalClientsThisMonth={totalClientsThisMonth}
         />
-        <ClientsTable clients={clients} />
+        <ClientsTable clients={clients} q={q} status={status} type={type} />
       </div>
     </div>
   );

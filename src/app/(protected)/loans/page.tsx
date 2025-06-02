@@ -20,17 +20,6 @@ export default async function DealsPage({
   const query = (await searchParams).query || "";
   const status = (await searchParams).status || "all";
 
-  const filteredLoans = allLoans.filter((loan) => {
-    const filterByQuery =
-      query === "" ||
-      loan.firstName.toLowerCase().includes(query.toLowerCase()) ||
-      loan.lastName.toLowerCase().includes(query.toLowerCase());
-
-    const filterByStatus = status || loan.status === status;
-
-    return filterByQuery && filterByStatus;
-  });
-
   return (
     <div className="container space-y-6">
       <header className="flex items-center justify-between">
@@ -46,7 +35,7 @@ export default async function DealsPage({
         </Button>
       </header>
 
-      <AllLoansTable loans={filteredLoans} query={query} status={status} />
+      <AllLoansTable loans={allLoans} query={query} status={status} />
     </div>
   );
 }

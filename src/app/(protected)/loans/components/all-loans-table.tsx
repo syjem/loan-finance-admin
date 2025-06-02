@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Select,
   SelectContent,
@@ -23,7 +23,7 @@ import { FilterableDealsTable } from "./filterable-loans-table";
 import { useRouter } from "next/navigation";
 
 export type AllLoans = {
-  id: string;
+  id: number;
   amount: number;
   purpose: string;
   status: "active" | "overdue" | "completed";
@@ -45,18 +45,6 @@ const AllLoansTable = ({
   const [searchTerm, setSearchTerm] = useState(query);
   const [statusFilter, setStatusFilter] = useState(status);
   const router = useRouter();
-
-  useEffect(() => {
-    if (query) {
-      setSearchTerm(query);
-    }
-  }, [query]);
-
-  useEffect(() => {
-    if (status) {
-      setStatusFilter(status);
-    }
-  }, [status]);
 
   const handleSearchClient = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -96,8 +84,7 @@ const AllLoansTable = ({
     setSearchTerm("");
     setStatusFilter("all");
 
-    const queryString = search.toString();
-    router.push(`/loans${queryString ? `?${queryString}` : ""}`);
+    router.push(`/loans`);
   };
 
   return (
