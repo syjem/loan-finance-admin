@@ -11,9 +11,12 @@ export async function createLoanOfficer(
   const supabase = await createAdminClient();
 
   const fullName = `${formData.firstName} ${formData.lastName}`;
+  const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+    fullName
+  )}`;
   const user = formData.role === "agent" ? "Agent" : "Admin";
 
-  const { error } = await supabase.auth.admin.createUser({
+  const { data: createdUser, error } = await supabase.auth.admin.createUser({
     email: formData.email,
     password: formData.password,
     phone: toE164(formData.phone),
@@ -25,18 +28,41 @@ export async function createLoanOfficer(
       totalLoan: 0,
       position: formData.position,
       start_date: formData.startDate,
-      avatar_url: `https://ui-avatars.com/api/?name=${encodeURIComponent(
-        fullName
-      )}`,
+      avatar_url: avatarUrl,
     },
   });
 
   if (error) {
+    const errorMessage =
+      error.message || `An error has occurred while adding the ${user}.`;
+
     console.error(error.message);
     return {
       success: false,
+      message: errorMessage,
+    };
+  }
+
+  const userId = createdUser?.user?.id;
+
+  const { error: insertError } = await supabase.from("loan_agents").insert({
+    id: userId,
+    full_name: fullName,
+    email: formData.email,
+    phone: formData.phone,
+    role: formData.role,
+    position: formData.position,
+    start_date: formData.startDate,
+    avatar_url: avatarUrl,
+  });
+
+  if (insertError) {
+    console.error(insertError.message);
+    await supabase.auth.admin.deleteUser(userId); // rollback
+    return {
+      success: false,
       message:
-        error.message || `An error has occured while adding the ${user}.`,
+        "User created, but failed to save profile. User has been rolled back.",
     };
   }
 

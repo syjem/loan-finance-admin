@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { FormValues } from "@/lib/types";
 import { AddClientFormValues } from "@/app/(protected)/clients/components/add-client-form";
-import { LoanEditFormValues } from "./(protected)/loans/components/loan-edit-form";
+import { LoanEditFormValues } from "@/app/(protected)/loans/components/loan-edit-form";
 
 export const createLoanApplication = async (formData: FormValues) => {
   console.log(formData);

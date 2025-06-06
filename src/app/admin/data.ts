@@ -1,21 +1,16 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 
-export const listAllAgents = async () => {
+export const getAllAgents = async () => {
   const supabase = await createAdminClient();
 
-  const {
-    data: { users },
-    error,
-  } = await supabase.auth.admin.listUsers();
+  const { data, error } = await supabase.from("loan_agents").select(`*`);
 
   if (error) {
     console.error(error.message);
     return;
   }
 
-  const loanAgents = users.filter(
-    (user) => user?.user_metadata.role === "agent"
-  );
+  const loanAgents = data.filter((user) => user?.role === "agent");
 
   return loanAgents;
 };

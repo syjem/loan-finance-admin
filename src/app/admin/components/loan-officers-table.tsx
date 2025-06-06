@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
-import type { User as UserType } from "@supabase/supabase-js";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,15 +48,35 @@ import {
 import { deleteLoanOfficer } from "@/app/actions/admin";
 import { getInitials } from "@/lib/utils";
 
-export function LoanOfficersTable({ loanAgents }: { loanAgents: UserType[] }) {
+type LoanAgentsType = {
+  id: string;
+  email: string;
+  phone: string;
+  full_name: string;
+  position: string;
+  start_date: string;
+  total_loans: number;
+  avatar_url: string;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export function LoanOfficersTable({
+  loanAgents,
+}: {
+  loanAgents: LoanAgentsType[];
+}) {
   const agents = loanAgents.map((agent) => ({
     id: agent.id,
     email: agent.email,
     phone: agent.phone,
-    fullName: agent.user_metadata.full_name,
-    position: agent.user_metadata.position,
-    start_date: agent.user_metadata.start_date,
-    avatar_url: agent.user_metadata.avatar_url,
+    fullName: agent.full_name,
+    position: agent.position,
+    start_date: agent.start_date,
+    total_loans: agent.total_loans,
+    avatar_url: agent.avatar_url,
+    created_at: agent.created_at,
+    updated_at: agent.updated_at,
   }));
 
   const router = useRouter();
@@ -118,7 +137,7 @@ export function LoanOfficersTable({ loanAgents }: { loanAgents: UserType[] }) {
               <TableHead className="hidden md:table-cell">Contact</TableHead>
               <TableHead>Position</TableHead>
               <TableHead className="hidden lg:table-cell">
-                Performance
+                Total Loans
               </TableHead>
               <TableHead className="hidden lg:table-cell">Join Date</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -168,7 +187,7 @@ export function LoanOfficersTable({ loanAgents }: { loanAgents: UserType[] }) {
                       </div>
                       <div className="flex items-center gap-1">
                         <Phone className="h-3 w-3 text-muted-foreground" />
-                        <span className="text-sm">+{agent.phone}</span>
+                        <span className="text-sm">{agent.phone}</span>
                       </div>
                     </div>
                   </TableCell>
@@ -180,15 +199,7 @@ export function LoanOfficersTable({ loanAgents }: { loanAgents: UserType[] }) {
                     </Badge>
                   </TableCell>
                   <TableCell className="hidden lg:table-cell">
-                    {/* <div>
-                      <div className="text-sm font-medium">
-                        {agent.totalLoans} loans
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        {agent.approvalRate}% approval
-                      </div>
-                    </div> */}
-                    (Number of loans here)
+                    {agent.total_loans}
                   </TableCell>
                   <TableCell className="hidden lg:table-cell">
                     <div className="text-sm">

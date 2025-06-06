@@ -76,6 +76,7 @@ export function AddLoanAgentForm() {
       });
     } catch (error) {
       console.error("Error creating officer:", error);
+      toast.error("An error occured, please try again.");
     }
   };
 
