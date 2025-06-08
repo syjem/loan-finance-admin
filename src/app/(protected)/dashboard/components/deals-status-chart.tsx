@@ -6,6 +6,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { useStatusStats } from "@/hooks/subscriptions/use-status-stats";
 
 type Stats = {
   name: string;
@@ -13,7 +14,9 @@ type Stats = {
   color: string;
 };
 
-export function DealStatusChart({ stats }: { stats: Stats[] }) {
+export function DealStatusChart({ stats: initialStats }: { stats: Stats[] }) {
+  const { data: stats = initialStats } = useStatusStats();
+
   return (
     <ChartContainer
       config={{

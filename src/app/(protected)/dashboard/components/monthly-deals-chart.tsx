@@ -15,6 +15,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { useMonthlyStats } from "@/hooks/subscriptions/use-monthly-stats";
 
 type Stats = {
   active: number;
@@ -23,7 +24,9 @@ type Stats = {
   name: string;
 };
 
-export function MonthlyDealsChart({ stats }: { stats: Stats[] }) {
+export function MonthlyDealsChart({ stats: initialStats }: { stats: Stats[] }) {
+  const { data: stats = initialStats } = useMonthlyStats();
+
   return (
     <ChartContainer
       config={{

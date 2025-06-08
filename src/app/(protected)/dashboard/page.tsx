@@ -99,17 +99,17 @@ export default async function Dashboard() {
             />
           </CardContent>
         </Card>
-      </div>
 
-      <div className="grid auto-rows-fr gap-4 md:grid-cols-3 items-stretch mt-4">
-        <Card className="bg-muted/50 col-span-1 md:col-span-2">
-          <CardHeader>
-            <CardTitle>Clients Overview</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ClientsOverviewChart clientsTotalValue={clientsTotalValue} />
-          </CardContent>
-        </Card>
+        <div className="grid auto-rows-fr gap-4 md:grid-cols-3 items-stretch">
+          <Card className="bg-muted/50 col-span-1 md:col-span-2">
+            <CardHeader>
+              <CardTitle>Clients Overview</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ClientsOverviewChart clientsTotalValue={clientsTotalValue} />
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </React.Fragment>
   );

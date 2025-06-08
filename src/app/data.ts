@@ -136,15 +136,24 @@ export const getLoansById = async (id: number) => {
   return data ?? [];
 };
 
-export const getAllLoans = async () => {
+export const getAllLoans = async (page: number = 1, pageSize: number = 10) => {
   const supabase = await createClient();
-  const { data, error } = await supabase
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  const { data, error, count } = await supabase
     .from("all_loan_applications")
-    .select(`*`);
+    .select("*", { count: "exact" })
+    .order("created_at", { ascending: false })
+    .range(from, to);
 
-  if (error) return [];
+  if (error) return { data: [], hasMore: false, total: 0 };
 
-  return data ?? [];
+  return {
+    data: data ?? [],
+    hasMore: count ? count > page * pageSize : false,
+    total: count ?? 0,
+  };
 };
 
 export const getLoanStatusPercentage = async () => {

@@ -3,18 +3,16 @@
 import useSWR from "swr";
 import useSWRSubscription from "swr/subscription";
 import { supabase } from "@/lib/supabase/client";
-import { getRecentLoanApplications } from "@/app/data";
+import { getLoanMonthlyStats } from "@/app/data";
 
-export const key = "recent_loan_applications";
+export const key = "realtime_monthly_stats";
 
-export const useRecentLoanApplications = () => {
-  const swr = useSWR(key, getRecentLoanApplications, {
-    revalidateOnFocus: false,
-  });
+export const useMonthlyStats = () => {
+  const swr = useSWR(key, getLoanMonthlyStats, { revalidateOnFocus: false });
 
   useSWRSubscription(key, (key, { next }) => {
     const channel = supabase
-      .channel("realtime-recent-loan-applications")
+      .channel("realtime-monthly-stats")
       .on(
         "postgres_changes",
         {
@@ -35,4 +33,4 @@ export const useRecentLoanApplications = () => {
   });
 
   return swr;
-};
+}; 
