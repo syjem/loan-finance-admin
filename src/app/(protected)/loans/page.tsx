@@ -16,9 +16,11 @@ export default async function DealsPage({
 }: {
   searchParams: Promise<{ query: string; status: string }>;
 }) {
-  const data = await getAllLoans();
-  const query = (await searchParams).query || "";
-  const status = (await searchParams).status || "all";
+  const params = await searchParams;
+  const query = params.query || "";
+  const status = params.status || "all";
+
+  const data = await getAllLoans(1, 10, query, status);
 
   return (
     <div className="container space-y-6">

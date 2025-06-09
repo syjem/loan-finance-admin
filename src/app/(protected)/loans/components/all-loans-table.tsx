@@ -23,26 +23,28 @@ import { FilterableDealsTable } from "./filterable-loans-table";
 import { useRouter } from "next/navigation";
 
 export type LoanType = {
-  data: {
-    id: number;
-    amount: number;
-    purpose: string;
-    status: "active" | "overdue" | "completed";
-    created_at: string;
-    firstName: string;
-    lastName: string;
-    avatar: string;
-  }[];
+  id: number;
+  amount: number;
+  purpose: string;
+  status: "active" | "overdue" | "completed";
+  created_at: string;
+  firstName: string;
+  lastName: string;
+  avatar: string;
+};
+
+interface LoansResponse {
+  data: LoanType[];
   hasMore: boolean;
   total: number;
-};
+}
 
 const AllLoansTable = ({
   loans,
   query,
   status,
 }: {
-  loans: LoanType;
+  loans: LoansResponse;
   query: string;
   status: string;
 }) => {
@@ -158,7 +160,7 @@ const AllLoansTable = ({
           <FilterableDealsTable
             searchTerm={searchTerm}
             statusFilter={statusFilter}
-            loans={loans}
+            loans={loans.data}
           />
         </CardContent>
       </Card>

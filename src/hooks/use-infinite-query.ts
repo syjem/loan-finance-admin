@@ -64,6 +64,10 @@ interface UseInfiniteQueryProps<T extends SupabaseTableName> {
   initialData?: SupabaseTableData<T>[];
   // Initial count of the data from the server
   initialCount?: number;
+  // Search term for filtering
+  searchTerm?: string;
+  // Status filter
+  statusFilter?: string;
 }
 
 interface StoreState<TData> {
@@ -89,6 +93,8 @@ function createStore<
     trailingQuery,
     initialData = [],
     initialCount = initialData.length,
+    searchTerm = "",
+    statusFilter = "all",
   } = props;
 
   let state: StoreState<TData> = {
@@ -125,9 +131,20 @@ function createStore<
       count: "exact",
     }) as unknown as SupabaseSelectBuilder<T>;
 
+    // Apply search filter
+    if (searchTerm) {
+      query = query.or(`firstName.ilike.%${searchTerm}%,lastName.ilike.%${searchTerm}%`);
+    }
+
+    // Apply status filter
+    if (statusFilter && statusFilter !== "all") {
+      query = query.eq("status", statusFilter);
+    }
+
     if (trailingQuery) {
       query = trailingQuery(query);
     }
+
     const {
       data: newData,
       count,
@@ -138,6 +155,7 @@ function createStore<
       console.error("An unexpected error occurred:", error);
       setState({ error });
     } else {
+      // Filter out any duplicates that might exist in initialData
       const deduplicatedData = ((newData || []) as TData[]).filter(
         (item) => !state.data.find((old) => old.id === item.id)
       );

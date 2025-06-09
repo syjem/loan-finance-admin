@@ -23,7 +23,7 @@ import { useInfiniteQuery } from "@/hooks/use-infinite-query";
 interface FilterableDealsTableProps {
   searchTerm: string;
   statusFilter: string;
-  loans: LoanType;
+  loans: LoanType[];
 }
 
 export function FilterableDealsTable({
@@ -36,12 +36,14 @@ export function FilterableDealsTable({
   const loadingRef = useRef<HTMLTableRowElement>(null);
 
   const { data, isLoading, isFetching, hasMore, fetchNextPage } =
-    useInfiniteQuery({
+    useInfiniteQuery<LoanType>({
       tableName: "all_loan_applications",
       columns: "*",
       pageSize: 10,
       trailingQuery: (query) => query.order("created_at", { ascending: false }),
       initialData: loans,
+      searchTerm,
+      statusFilter,
     });
 
   useEffect(() => {
@@ -65,22 +67,12 @@ export function FilterableDealsTable({
     };
   }, [hasMore, isFetching, fetchNextPage]);
 
-  // Filter the deals based on search term and status
-  const filteredLoans = data?.filter((loan) => {
-    const matchesSearch =
-      searchTerm === "" ||
-      loan.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      loan.lastName.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesStatus =
-      statusFilter === "all" || loan.status === statusFilter;
-
-    return matchesSearch && matchesStatus;
-  });
-
   const handleRowClick = (loanId: number) => {
     router.push(`/loans/details?id=${loanId}`);
   };
+
+  // Only use client-side data when filters are applied
+  const displayData = searchTerm || statusFilter !== "all" ? data : [...loans, ...data.filter(loan => !loans.some(initialLoan => initialLoan.id === loan.id))];
 
   return (
     <div className="rounded-md border">
@@ -96,7 +88,7 @@ export function FilterableDealsTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredLoans.length === 0 ? (
+          {displayData.length === 0 ? (
             <TableRow>
               <TableCell colSpan={7} className="h-24 text-center">
                 <div className="flex flex-col items-center gap-2">
@@ -110,7 +102,7 @@ export function FilterableDealsTable({
               </TableCell>
             </TableRow>
           ) : (
-            filteredLoans.map((loan) => (
+            displayData.map((loan) => (
               <TableRow
                 key={loan.id}
                 onClick={() => handleRowClick(loan.id)}
