@@ -16,7 +16,7 @@ export default async function DealsPage({
 }: {
   searchParams: Promise<{ query: string; status: string }>;
 }) {
-  const allLoans = await getAllLoans();
+  const data = await getAllLoans();
   const query = (await searchParams).query || "";
   const status = (await searchParams).status || "all";
 
@@ -35,7 +35,7 @@ export default async function DealsPage({
         </Button>
       </header>
 
-      <AllLoansTable loans={allLoans} query={query} status={status} />
+      <AllLoansTable loans={data} query={query} status={status} />
     </div>
   );
 }

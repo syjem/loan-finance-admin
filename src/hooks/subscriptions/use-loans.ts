@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+"use client";
+
 import useSWR from "swr";
 import useSWRSubscription from "swr/subscription";
 import { supabase } from "@/lib/supabase/client";
@@ -43,4 +44,4 @@ export const useLoans = (page: number) => {
     isLoading,
     hasMore: data?.hasMore,
   };
-}; 
+};

@@ -22,23 +22,27 @@ import { Label } from "@/components/ui/label";
 import { FilterableDealsTable } from "./filterable-loans-table";
 import { useRouter } from "next/navigation";
 
-export type AllLoans = {
-  id: number;
-  amount: number;
-  purpose: string;
-  status: "active" | "overdue" | "completed";
-  created_at: string;
-  firstName: string;
-  lastName: string;
-  avatar: string;
-}[];
+export type LoanType = {
+  data: {
+    id: number;
+    amount: number;
+    purpose: string;
+    status: "active" | "overdue" | "completed";
+    created_at: string;
+    firstName: string;
+    lastName: string;
+    avatar: string;
+  }[];
+  hasMore: boolean;
+  total: number;
+};
 
 const AllLoansTable = ({
   loans,
   query,
   status,
 }: {
-  loans: AllLoans;
+  loans: LoanType;
   query: string;
   status: string;
 }) => {
