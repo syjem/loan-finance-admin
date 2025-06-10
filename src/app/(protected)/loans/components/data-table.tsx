@@ -1,10 +1,9 @@
 "use client";
 
+import React from "react";
 import { CalendarIcon, FileText } from "lucide-react";
 import { format } from "date-fns";
-import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
-
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -14,68 +13,50 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { LoanType } from "./all-loans-table";
+import { LoanType } from "./loans-table-and-filter";
 import { cn, formatCurrency, getInitials } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useInfiniteQuery } from "@/hooks/use-infinite-query";
+import { Button } from "@/components/ui/button";
 
-interface FilterableDealsTableProps {
+interface DataTableProps {
   searchTerm: string;
   statusFilter: string;
-  loans: LoanType[];
+  page: number;
+  loans: LoanType;
+  hasMore: boolean;
 }
 
-export function FilterableDealsTable({
+export function DataTable({
   searchTerm,
   statusFilter,
+  page,
   loans,
-}: FilterableDealsTableProps) {
+  hasMore,
+}: DataTableProps) {
   const router = useRouter();
-  const observerRef = useRef<IntersectionObserver | null>(null);
-  const loadingRef = useRef<HTMLTableRowElement>(null);
-
-  const { data, isLoading, isFetching, hasMore, fetchNextPage } =
-    useInfiniteQuery<LoanType>({
-      tableName: "all_loan_applications",
-      columns: "*",
-      pageSize: 10,
-      trailingQuery: (query) => query.order("created_at", { ascending: false }),
-      initialData: loans,
-      searchTerm,
-      statusFilter,
-    });
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isFetching) {
-          fetchNextPage();
-        }
-      },
-      { threshold: 1.0 }
-    );
-
-    if (loadingRef.current) {
-      observer.observe(loadingRef.current);
-    }
-
-    observerRef.current = observer;
-
-    return () => {
-      observerRef.current?.disconnect();
-    };
-  }, [hasMore, isFetching, fetchNextPage]);
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   const handleRowClick = (loanId: number) => {
     router.push(`/loans/details?id=${loanId}`);
   };
 
-  // Only use client-side data when filters are applied
-  const displayData = searchTerm || statusFilter !== "all" ? data : [...loans, ...data.filter(loan => !loans.some(initialLoan => initialLoan.id === loan.id))];
+  const handlePageChange = (newPage: number) => {
+    const page = new URLSearchParams(searchParams);
+
+    if (newPage === 1) {
+      page.delete("page");
+    } else {
+      page.set("page", newPage.toString());
+    }
+
+    const pageParams = page.toString();
+
+    router.push(`${pathname}?${pageParams ? `${pageParams}` : ""}`);
+  };
 
   return (
-    <div className="rounded-md border">
+    <React.Fragment>
       <Table>
         <TableHeader>
           <TableRow>
@@ -88,7 +69,7 @@ export function FilterableDealsTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {displayData.length === 0 ? (
+          {loans.length === 0 ? (
             <TableRow>
               <TableCell colSpan={7} className="h-24 text-center">
                 <div className="flex flex-col items-center gap-2">
@@ -102,7 +83,7 @@ export function FilterableDealsTable({
               </TableCell>
             </TableRow>
           ) : (
-            displayData.map((loan) => (
+            loans.map((loan) => (
               <TableRow
                 key={loan.id}
                 onClick={() => handleRowClick(loan.id)}
@@ -153,20 +134,57 @@ export function FilterableDealsTable({
               </TableRow>
             ))
           )}
-          {hasMore && (
-            <TableRow ref={loadingRef}>
-              <TableCell colSpan={6} className="h-24 text-center">
-                {isLoading ? (
-                  <div className="flex items-center justify-center">
-                    <Skeleton className="h-8 w-8 rounded-full" />
-                    <span className="ml-2">Loading more...</span>
-                  </div>
-                ) : null}
-              </TableCell>
-            </TableRow>
-          )}
         </TableBody>
       </Table>
-    </div>
+
+      <div
+        className={cn(
+          "pt-4 border-t flex items-center justify-end",
+          (searchTerm || statusFilter !== "all") && "justify-between"
+        )}
+      >
+        {(searchTerm || statusFilter !== "all") && (
+          <div className="flex flex-wrap shrink-0 gap-2">
+            <span className="text-sm text-muted-foreground">
+              Active filters:
+            </span>
+            {searchTerm && (
+              <Badge variant="outline" className="text-xs">
+                Client: {searchTerm}
+              </Badge>
+            )}
+            {statusFilter !== "all" && (
+              <Badge variant="outline" className="text-xs capitalize">
+                Status: {statusFilter}
+              </Badge>
+            )}
+            {loans.length > 0 && (
+              <Badge variant="outline" className="text-xs">
+                Total: {loans.length}
+              </Badge>
+            )}
+          </div>
+        )}
+
+        <div className="flex gap-2 items-center">
+          <Button
+            size="sm"
+            onClick={() => handlePageChange(page - 1)}
+            disabled={page <= 1}
+            variant={page <= 1 ? "outline" : "default"}
+          >
+            Prev
+          </Button>
+          <Button
+            size="sm"
+            onClick={() => handlePageChange(page + 1)}
+            disabled={!hasMore}
+            variant={!hasMore ? "outline" : "default"}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
+    </React.Fragment>
   );
 }

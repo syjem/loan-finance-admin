@@ -153,7 +153,9 @@ export const getAllLoans = async (
 
   // Apply search filter
   if (searchTerm) {
-    query = query.or(`firstName.ilike.%${searchTerm}%,lastName.ilike.%${searchTerm}%`);
+    query = query.or(
+      `firstName.ilike.%${searchTerm}%,lastName.ilike.%${searchTerm}%`
+    );
   }
 
   // Apply status filter
@@ -163,12 +165,11 @@ export const getAllLoans = async (
 
   const { data, error, count } = await query.range(from, to);
 
-  if (error) return { data: [], hasMore: false, total: 0 };
+  if (error) return { data: [], hasMore: false };
 
   return {
     data: data ?? [],
     hasMore: count ? count > page * pageSize : false,
-    total: count ?? 0,
   };
 };
 

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import AllLoansTable from "./components/all-loans-table";
+import LoansTableAndFilter from "./components/loans-table-and-filter";
 import { getAllLoans } from "@/app/data";
 
 export const metadata: Metadata = {
@@ -11,16 +11,17 @@ export const metadata: Metadata = {
   description: "Manage loan applications",
 };
 
-export default async function DealsPage({
+export default async function LoansPage({
   searchParams,
 }: {
-  searchParams: Promise<{ query: string; status: string }>;
+  searchParams: Promise<{ query: string; status: string; page: number }>;
 }) {
   const params = await searchParams;
   const query = params.query || "";
   const status = params.status || "all";
+  const page = Number(params.page || 1);
 
-  const data = await getAllLoans(1, 10, query, status);
+  const { data, hasMore } = await getAllLoans(page, 10, query, status);
 
   return (
     <div className="container space-y-6">
@@ -37,7 +38,13 @@ export default async function DealsPage({
         </Button>
       </header>
 
-      <AllLoansTable loans={data} query={query} status={status} />
+      <LoansTableAndFilter
+        loans={data}
+        query={query}
+        status={status}
+        page={page}
+        hasMore={hasMore}
+      />
     </div>
   );
 }

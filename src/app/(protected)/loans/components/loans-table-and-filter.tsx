@@ -19,8 +19,9 @@ import { Filter, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { FilterableDealsTable } from "./filterable-loans-table";
-import { useRouter } from "next/navigation";
+import { DataTable } from "./data-table";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useDebouncedCallback } from "use-debounce";
 
 export type LoanType = {
   id: number;
@@ -31,32 +32,29 @@ export type LoanType = {
   firstName: string;
   lastName: string;
   avatar: string;
-};
+}[];
 
-interface LoansResponse {
-  data: LoanType[];
-  hasMore: boolean;
-  total: number;
-}
-
-const AllLoansTable = ({
+const LoansTableAndFilter = ({
   loans,
   query,
   status,
+  page,
+  hasMore,
 }: {
-  loans: LoansResponse;
+  loans: LoanType;
   query: string;
   status: string;
+  page: number;
+  hasMore: boolean;
 }) => {
   const [searchTerm, setSearchTerm] = useState(query);
   const [statusFilter, setStatusFilter] = useState(status);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
 
-  const handleSearchClient = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-
-    const search = new URLSearchParams(window.location.search);
+  const updateSearchQuery = useDebouncedCallback((value: string) => {
+    const search = new URLSearchParams(searchParams);
 
     if (value.trim() === "") {
       search.delete("query");
@@ -65,26 +63,31 @@ const AllLoansTable = ({
     }
 
     const queryString = search.toString();
-    router.push(`/loans${queryString ? `?${queryString}` : ""}`);
+    router.replace(`${pathname}${queryString ? `?${queryString}` : ""}`);
+  }, 300);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    updateSearchQuery(value);
   };
 
   const handleChangeFilter = (value: string) => {
     setStatusFilter(value);
 
-    const search = new URLSearchParams(window.location.search);
+    const status = new URLSearchParams(searchParams);
     if (value === "all") {
-      search.delete("status");
+      status.delete("status");
     } else {
-      search.set("status", value);
+      status.set("status", value);
     }
 
-    // Preserve existing `query` param (if any)
-    const query = search.toString();
-    router.push(`/loans${query ? `?${query}` : ""}`);
+    const statusParams = status.toString();
+    router.push(`${pathname}${statusParams ? `?${statusParams}` : ""}`);
   };
 
   const handleClearFilters = () => {
-    const search = new URLSearchParams(window.location.search);
+    const search = new URLSearchParams(searchParams);
     search.delete("query");
     search.delete("status");
     setSearchTerm("");
@@ -110,7 +113,7 @@ const AllLoansTable = ({
                 htmlFor="search"
                 className="text-sm font-medium mb-2 block"
               >
-                Search by Client&apos;s Name
+                Search by client&apos;s name
               </Label>
               <div className="relative md:max-w-md">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -120,7 +123,7 @@ const AllLoansTable = ({
                   placeholder="Search client names..."
                   className="pl-8"
                   value={searchTerm}
-                  onChange={handleSearchClient}
+                  onChange={handleChange}
                 />
               </div>
             </div>
@@ -157,10 +160,12 @@ const AllLoansTable = ({
           <CardTitle>Recent Applications</CardTitle>
         </CardHeader>
         <CardContent>
-          <FilterableDealsTable
+          <DataTable
             searchTerm={searchTerm}
             statusFilter={statusFilter}
-            loans={loans.data}
+            loans={loans}
+            page={page}
+            hasMore={hasMore}
           />
         </CardContent>
       </Card>
@@ -168,4 +173,4 @@ const AllLoansTable = ({
   );
 };
 
-export default AllLoansTable;
+export default LoansTableAndFilter;
