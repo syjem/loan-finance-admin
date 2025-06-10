@@ -148,8 +148,7 @@ export const getAllLoans = async (
 
   let query = supabase
     .from("all_loan_applications")
-    .select("*", { count: "exact" })
-    .order("created_at", { ascending: false });
+    .select("*", { count: "exact" });
 
   // Apply search filter
   if (searchTerm) {
@@ -163,13 +162,18 @@ export const getAllLoans = async (
     query = query.eq("status", statusFilter);
   }
 
+  query = query.order("created_at", { ascending: false });
+
   const { data, error, count } = await query.range(from, to);
 
-  if (error) return { data: [], hasMore: false };
+  if (error || count === null) {
+    return { data: [], hasMore: false, total: 0 };
+  }
 
   return {
     data: data ?? [],
-    hasMore: count ? count > page * pageSize : false,
+    hasMore: count > to + 1,
+    total: count,
   };
 };
 

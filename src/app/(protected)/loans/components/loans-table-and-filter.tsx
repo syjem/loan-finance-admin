@@ -87,13 +87,15 @@ const LoansTableAndFilter = ({
   };
 
   const handleClearFilters = () => {
-    const search = new URLSearchParams(searchParams);
-    search.delete("query");
-    search.delete("status");
+    const params = new URLSearchParams(searchParams);
+    params.delete("query");
+    params.delete("status");
     setSearchTerm("");
     setStatusFilter("all");
 
-    router.push(`/loans`);
+    const pageNumber = Number(params.get("page") || 1);
+
+    router.push(`${pathname}?${pageNumber > 1 ? `page=${pageNumber}` : ""}`);
   };
 
   return (

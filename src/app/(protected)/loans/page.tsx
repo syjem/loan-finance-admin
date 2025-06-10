@@ -21,7 +21,13 @@ export default async function LoansPage({
   const status = params.status || "all";
   const page = Number(params.page || 1);
 
-  const { data, hasMore } = await getAllLoans(page, 10, query, status);
+  const perPage = 10;
+
+  const { data, hasMore } = await getAllLoans(page, perPage, query, status);
+
+  console.log("Page:", page);
+  console.log(data);
+  console.log("Status:", status);
 
   return (
     <div className="container space-y-6">
