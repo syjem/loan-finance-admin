@@ -25,10 +25,6 @@ export default async function LoansPage({
 
   const { data, hasMore } = await getAllLoans(page, perPage, query, status);
 
-  console.log("Page:", page);
-  console.log(data);
-  console.log("Status:", status);
-
   return (
     <div className="container space-y-6">
       <header className="flex items-center justify-between">

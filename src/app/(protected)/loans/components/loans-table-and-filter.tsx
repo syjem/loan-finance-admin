@@ -75,15 +75,18 @@ const LoansTableAndFilter = ({
   const handleChangeFilter = (value: string) => {
     setStatusFilter(value);
 
-    const status = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams);
+
+    params.delete("page");
+
     if (value === "all") {
-      status.delete("status");
+      params.delete("status");
     } else {
-      status.set("status", value);
+      params.set("status", value);
     }
 
-    const statusParams = status.toString();
-    router.push(`${pathname}${statusParams ? `?${statusParams}` : ""}`);
+    const queryString = params.toString();
+    router.push(`${pathname}${queryString ? `?${queryString}` : ""}`);
   };
 
   const handleClearFilters = () => {
