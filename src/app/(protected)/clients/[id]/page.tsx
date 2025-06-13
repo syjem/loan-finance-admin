@@ -20,8 +20,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ClientLoansTable } from "@/app/(protected)/clients/components/client-loans-table";
 import { getClientById } from "@/app/data";
-import { formatCurrency, getInitials } from "@/lib/utils";
-import { format } from "date-fns";
+import { formatCurrency, formatDate, getInitials } from "@/lib/utils";
 
 type ParamsType = {
   params: Promise<{ id: string }>;
@@ -179,7 +178,7 @@ const ClientProfilePage = async ({ params }: ParamsType) => {
                   <div className="grid grid-cols-2 gap-2">
                     <div className="text-sm">Client Since</div>
                     <div className="text-sm font-medium">
-                      {format(client.created_at, "MMM d, yyyy")}
+                      {formatDate(client.created_at)}
                     </div>
                   </div>
                 </div>
@@ -222,20 +221,17 @@ const ClientProfilePage = async ({ params }: ParamsType) => {
                   </div>
                   <div className="text-sm">
                     {client.loans.length > 0
-                      ? format(
-                          new Date(
-                            client.loans
-                              .slice()
-                              .sort(
-                                (
-                                  a: { created_at: string },
-                                  b: { created_at: string }
-                                ) =>
-                                  new Date(b.created_at).getTime() -
-                                  new Date(a.created_at).getTime()
-                              )[0].created_at
-                          ),
-                          "MMM d, yyyy"
+                      ? formatDate(
+                          client.loans
+                            .slice()
+                            .sort(
+                              (
+                                a: { created_at: string },
+                                b: { created_at: string }
+                              ) =>
+                                new Date(b.created_at).getTime() -
+                                new Date(a.created_at).getTime()
+                            )[0].created_at
                         )
                       : "No activity"}
                   </div>

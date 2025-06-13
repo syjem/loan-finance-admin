@@ -6,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { CalendarIcon, Loader2 } from "lucide-react";
-import { format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,7 +33,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
+import { cn, formatFieldValue } from "@/lib/utils";
 import { updateLoan } from "@/app/actions";
 import type { Loan } from "@/lib/types";
 import { toast } from "sonner";
@@ -217,7 +216,7 @@ export function LoanEditForm({ loan }: { loan: Loan }) {
                           )}
                         >
                           {field.value ? (
-                            format(field.value, "PPP")
+                            formatFieldValue(field.value)
                           ) : (
                             <span>Pick a date</span>
                           )}

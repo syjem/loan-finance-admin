@@ -1,8 +1,6 @@
 "use client";
 
 import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
-
 import {
   Table,
   TableBody,
@@ -12,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { cn, formatCurrency, getInitials } from "@/lib/utils";
+import { cn, formatCurrency, formatDate, getInitials } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRecentLoanApplications } from "@/hooks/subscriptions/use-recent-application";
 import { useRouter } from "next/navigation";
@@ -82,7 +80,7 @@ const RecentApplicationTable = ({
               <TableCell className="hidden md:table-cell">
                 <div className="flex items-center gap-2">
                   <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-                  <span>{format(item.created_at, "MMM d, yyyy")}</span>
+                  <span>{formatDate(item.created_at)}</span>
                 </div>
               </TableCell>
               <TableCell>

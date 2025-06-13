@@ -54,15 +54,16 @@ const LoansTableAndFilter = ({
   const pathname = usePathname();
 
   const updateSearchQuery = useDebouncedCallback((value: string) => {
-    const search = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams);
+    params.delete("page");
 
     if (value.trim() === "") {
-      search.delete("query");
+      params.delete("query");
     } else {
-      search.set("query", value);
+      params.set("query", value);
     }
 
-    const queryString = search.toString();
+    const queryString = params.toString();
     router.replace(`${pathname}${queryString ? `?${queryString}` : ""}`);
   }, 300);
 

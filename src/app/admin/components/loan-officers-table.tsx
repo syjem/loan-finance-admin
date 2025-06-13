@@ -12,7 +12,6 @@ import {
   User,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,7 +45,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { deleteLoanOfficer } from "@/app/actions/admin";
-import { getInitials } from "@/lib/utils";
+import { formatDate, getInitials } from "@/lib/utils";
 
 type LoanAgentsType = {
   id: string;
@@ -203,7 +202,7 @@ export function LoanOfficersTable({
                   </TableCell>
                   <TableCell className="hidden lg:table-cell">
                     <div className="text-sm">
-                      {format(agent.start_date, "MMM d, yyyy")}
+                      {formatDate(agent.start_date)}
                     </div>
                   </TableCell>
                   <TableCell className="text-right">

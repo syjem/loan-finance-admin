@@ -2,7 +2,6 @@
 
 import React from "react";
 import { CalendarIcon, FileText } from "lucide-react";
-import { format } from "date-fns";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   Table,
@@ -14,9 +13,9 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { LoanType } from "./loans-table-and-filter";
-import { cn, formatCurrency, getInitials } from "@/lib/utils";
+import { cn, formatCurrency, formatDate, getInitials } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { PaginationComponent } from "@/components/custom-pagination";
 
 interface DataTableProps {
   searchTerm: string;
@@ -113,7 +112,7 @@ export function DataTable({
                 <TableCell className="hidden md:table-cell">
                   <div className="flex items-center gap-2">
                     <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-                    <span>{format(loan.created_at, "MMM d, yyyy")}</span>
+                    <span>{formatDate(loan.created_at)}</span>
                   </div>
                 </TableCell>
                 <TableCell>
@@ -165,25 +164,13 @@ export function DataTable({
             )}
           </div>
         )}
-
-        <div className="flex gap-2 items-center">
-          <Button
-            size="sm"
-            onClick={() => handlePageChange(page - 1)}
-            disabled={page <= 1}
-            variant={page <= 1 ? "outline" : "default"}
-          >
-            Prev
-          </Button>
-          <Button
-            size="sm"
-            onClick={() => handlePageChange(page + 1)}
-            disabled={!hasMore}
-            variant={!hasMore ? "outline" : "default"}
-          >
-            Next
-          </Button>
-        </div>
+        <PaginationComponent
+          page={page}
+          totalItems={loans.length}
+          perPage={10}
+          hasMore={hasMore}
+          onPageChange={handlePageChange}
+        />
       </div>
     </React.Fragment>
   );

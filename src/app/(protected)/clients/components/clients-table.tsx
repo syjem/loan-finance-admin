@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Search } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -14,62 +14,86 @@ import {
 } from "@/components/ui/select";
 import type { CLientType } from "@/lib/types";
 import DataTable from "./data-table";
+import { useDebouncedCallback } from "use-debounce";
 
 type ClientsTableProps = {
-  clients: CLientType[];
+  clients: {
+    data: CLientType[];
+    hasMore: boolean;
+    total: number;
+  };
   q: string;
   status: string;
   type: string;
+  page: number;
 };
 
-export function ClientsTable({ clients, q, status, type }: ClientsTableProps) {
+export function ClientsTable({
+  clients,
+  q,
+  status,
+  type,
+  page,
+}: ClientsTableProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
   const [searchTerm, setSearchTerm] = useState(q);
   const [statusFilter, setStatusFilter] = useState(status);
   const [typeFilter, setTypeFilter] = useState(type);
 
-  const handleSearchClient = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-
-    const search = new URLSearchParams(window.location.search);
+  const updateSearchQuery = useDebouncedCallback((value: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.delete("page");
 
     if (value.trim() === "") {
-      search.delete("q");
+      params.delete("q");
     } else {
-      search.set("q", value);
+      params.set("q", value);
     }
 
-    const queryString = search.toString();
-    router.push(`/clients${queryString ? `?${queryString}` : ""}`);
+    const queryString = params.toString();
+    router.replace(`${pathname}${queryString ? `?${queryString}` : ""}`);
+  }, 300);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    updateSearchQuery(value);
   };
 
   const handleChangeStatusFilter = (value: string) => {
     setStatusFilter(value);
 
-    const search = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(searchParams);
+
+    params.delete("page");
+
     if (value === "all") {
-      search.delete("status");
+      params.delete("status");
     } else {
-      search.set("status", value);
+      params.set("status", value);
     }
 
-    const query = search.toString();
-    router.push(`/clients${query ? `?${query}` : ""}`);
+    const query = params.toString();
+    router.push(`${pathname}${query ? `?${query}` : ""}`);
   };
 
   const handleChangeTypeFilter = (value: string) => {
     setTypeFilter(value);
 
-    const search = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(searchParams);
+
+    params.delete("page");
+
     if (value === "all") {
-      search.delete("type");
+      params.delete("type");
     } else {
-      search.set("type", value);
+      params.set("type", value);
     }
 
-    const query = search.toString();
-    router.push(`/clients${query ? `?${query}` : ""}`);
+    const query = params.toString();
+    router.push(`${pathname}${query ? `?${query}` : ""}`);
   };
 
   return (
@@ -86,7 +110,7 @@ export function ClientsTable({ clients, q, status, type }: ClientsTableProps) {
               placeholder="Search clients..."
               className="w-full pl-8 md:w-[200px] lg:w-[300px]"
               value={searchTerm}
-              onChange={handleSearchClient}
+              onChange={handleChange}
             />
           </div>
           <div className="flex flex-wrap sm:flex-nowrap gap-2">
@@ -121,6 +145,7 @@ export function ClientsTable({ clients, q, status, type }: ClientsTableProps) {
           q={searchTerm}
           status={statusFilter}
           type={typeFilter}
+          page={page}
           clients={clients}
         />
       </CardContent>

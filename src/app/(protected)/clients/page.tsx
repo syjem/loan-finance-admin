@@ -19,11 +19,24 @@ export const metadata: Metadata = {
   description: "Manage client information and loan history",
 };
 
-const ClientsPage = async ({
+export default async function ClientsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q: string; status: string; type: string }>;
-}) => {
+  searchParams: Promise<{
+    q: string;
+    status: string;
+    type: string;
+    page: number;
+  }>;
+}) {
+  const params = await searchParams;
+
+  const q = params.q || "";
+  const status = params.status || "all";
+  const type = params.type || "all";
+  const page = Number(params.page || 1);
+  const pageSize = 10;
+
   const [
     clients,
     totalNumberOfClients,
@@ -31,16 +44,12 @@ const ClientsPage = async ({
     totalBusinessClients,
     totalClientsThisMonth,
   ] = await Promise.all([
-    getClients(),
+    getClients(page, pageSize, q, status, type),
     getTotalNumberOfClients(),
     getActiveBorrowers(),
     getBusinessClients(),
     getClientsThisMonth(),
   ]);
-
-  const q = (await searchParams).q || "";
-  const status = (await searchParams).status || "all";
-  const type = (await searchParams).type || "all";
 
   return (
     <div className="container space-y-6">
@@ -63,10 +72,14 @@ const ClientsPage = async ({
           businessClients={totalBusinessClients}
           totalClientsThisMonth={totalClientsThisMonth}
         />
-        <ClientsTable clients={clients} q={q} status={status} type={type} />
+        <ClientsTable
+          clients={clients}
+          q={q}
+          status={status}
+          type={type}
+          page={page}
+        />
       </div>
     </div>
   );
-};
-
-export default ClientsPage;
+}

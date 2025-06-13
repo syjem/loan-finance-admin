@@ -31,6 +31,34 @@ export const formatDate = (isoDate: string) => {
   return formatted;
 };
 
+export function formatFieldValue(value: Date | undefined | null): string {
+  if (!value) return "";
+
+  const day = value.getDate();
+  const month = value.toLocaleString("en-US", { month: "short" });
+  const year = value.getFullYear();
+
+  const getDaySuffix = (day: number): string => {
+    if (day >= 11 && day <= 13) return "th";
+    switch (day % 10) {
+      case 1:
+        return "st";
+      case 2:
+        return "nd";
+      case 3:
+        return "rd";
+      default:
+        return "th";
+    }
+  };
+
+  return `${month} ${day}${getDaySuffix(day)}, ${year}`;
+}
+
+export function getMonthAbbreviation(date: Date): string {
+  return date.toLocaleString("en-US", { month: "short" });
+}
+
 export const getMonthlyPayment = (
   amount: number,
   interest: number,
@@ -70,3 +98,43 @@ export const toE164 = (phone: string): string => {
   }
   return phone;
 };
+
+export function getPaginationPages(
+  current: number,
+  total: number
+): (number | "...")[] {
+  const pages: (number | "...")[] = [];
+
+  // Show all pages if total is 5 or fewer
+  if (total <= 5) {
+    for (let i = 1; i <= total; i++) {
+      pages.push(i);
+    }
+    return pages;
+  }
+
+  // Always show the first page
+  pages.push(1);
+
+  // Show ellipsis if needed before current - 1
+  if (current > 3) {
+    pages.push("...");
+  }
+
+  // Show middle pages around current
+  const start = Math.max(2, current - 1);
+  const end = Math.min(total - 1, current + 1);
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+
+  // Show ellipsis if needed after current + 1
+  if (current < total - 2) {
+    pages.push("...");
+  }
+
+  // Always show the last page
+  pages.push(total);
+
+  return pages;
+}

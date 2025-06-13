@@ -2,10 +2,9 @@
 
 import { toast } from "sonner";
 import { useCallback, useEffect, useState } from "react";
-import { format } from "date-fns";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import { cn, getInitials } from "@/lib/utils";
+import { cn, formatFieldValue, getInitials } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createLoanApplication } from "@/app/actions";
 import { CalendarIcon, Check, ChevronsUpDown, Loader2 } from "lucide-react";
@@ -465,7 +464,7 @@ export function LoanApplicationForm({
                                 )}
                               >
                                 {field.value ? (
-                                  format(field.value, "PPP")
+                                  formatFieldValue(field.value)
                                 ) : (
                                   <span>Pick a date</span>
                                 )}
@@ -596,7 +595,7 @@ export function LoanApplicationForm({
                         </span>
                         <span>
                           {form.getValues("startDate")
-                            ? format(form.getValues("startDate"), "PPP")
+                            ? formatFieldValue(form.getValues("startDate"))
                             : "N/A"}
                         </span>
                       </div>

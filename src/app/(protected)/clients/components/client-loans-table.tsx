@@ -1,6 +1,4 @@
 import { FileText } from "lucide-react";
-import { format } from "date-fns";
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -19,7 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getClientLoansById } from "@/app/data";
-import { cn, formatCurrency } from "@/lib/utils";
+import { cn, formatCurrency, formatDate } from "@/lib/utils";
 import Link from "next/link";
 
 export const ClientLoansTable = async ({ clientId }: { clientId: string }) => {
@@ -76,7 +74,7 @@ export const ClientLoansTable = async ({ clientId }: { clientId: string }) => {
                       {loan.purpose}
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
-                      {format(loan.created_at, "MMM d, yyyy")}
+                      {formatDate(loan.created_at)}
                     </TableCell>
                     <TableCell className="capitalize">
                       <Badge

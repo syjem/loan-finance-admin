@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { formatCurrency, getInitials } from "@/lib/utils";
+import { cn, formatCurrency, getInitials } from "@/lib/utils";
 import {
   ArrowUpDown,
   MoreHorizontal,
@@ -32,48 +32,44 @@ import {
   Eye,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { CLientType } from "@/lib/types";
 
 type DataTableProps = {
   q: string;
   status: string;
   type: string;
-  clients: CLientType[];
+  page: number;
+  clients: {
+    data: CLientType[];
+    hasMore: boolean;
+    total: number;
+  };
 };
 
-const DataTable = ({ q, status, type, clients }: DataTableProps) => {
+const DataTable = ({ q, status, type, page, clients }: DataTableProps) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
   const handleViewClient = (clientId: string) => {
     router.push(`/clients/${clientId}`);
   };
 
-  // Filter clients based on search term and filters
-  const filteredClients = clients
-    .filter((client) => {
-      const matchesSearch =
-        q === "" ||
-        client.firstName?.toLowerCase().includes(q.toLowerCase()) ||
-        client.lastName?.toLowerCase().includes(q.toLowerCase()) ||
-        client.email?.toLowerCase().includes(q.toLowerCase()) ||
-        client.companyName?.toLowerCase().includes(q.toLowerCase());
+  const handlePageChange = (newPage: number) => {
+    const page = new URLSearchParams(searchParams);
 
-      const matchesStatus =
-        status === "all" ||
-        client.status.toLowerCase() === status.toLowerCase();
+    if (newPage === 1) {
+      page.delete("page");
+    } else {
+      page.set("page", newPage.toString());
+    }
 
-      const matchesType =
-        type === "all" || client.type.toLowerCase() === type.toLowerCase();
+    const pageParams = page.toString();
 
-      return matchesSearch && matchesStatus && matchesType;
-    })
-    .sort((a, b) => {
-      const totalA = a.loans.reduce((sum, loan) => sum + loan.amount, 0);
-      const totalB = b.loans.reduce((sum, loan) => sum + loan.amount, 0);
-      return sortDirection === "asc" ? totalA - totalB : totalB - totalA;
-    });
+    router.push(`${pathname}?${pageParams ? `${pageParams}` : ""}`);
+  };
 
   return (
     <>
@@ -101,14 +97,14 @@ const DataTable = ({ q, status, type, clients }: DataTableProps) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredClients.length === 0 ? (
+          {clients.data.length === 0 ? (
             <TableRow>
               <TableCell colSpan={6} className="h-24 text-center">
                 No clients found.
               </TableCell>
             </TableRow>
           ) : (
-            filteredClients.map((client) => {
+            clients.data.map((client) => {
               const name = `${client.firstName} ${client.lastName}`;
 
               return (
@@ -236,31 +232,60 @@ const DataTable = ({ q, status, type, clients }: DataTableProps) => {
           )}
         </TableBody>
       </Table>
-      {(q || status !== "all" || type !== "all") && (
-        <div className="flex flex-wrap shrink-0 gap-2 pt-4 border-t">
-          <span className="text-sm text-muted-foreground">Active filters:</span>
-          {q && (
-            <Badge variant="outline" className="text-xs">
-              Client: {q}
-            </Badge>
-          )}
-          {status !== "all" && (
-            <Badge variant="outline" className="text-xs capitalize">
-              Status: {status}
-            </Badge>
-          )}
-          {type !== "all" && (
-            <Badge variant="outline" className="text-xs capitalize">
-              Type: {type}
-            </Badge>
-          )}
-          {filteredClients.length > 0 && (
-            <Badge variant="outline" className="text-xs">
-              Total: {filteredClients.length}
-            </Badge>
-          )}
+
+      <div
+        className={cn(
+          "pt-4 border-t flex items-center justify-end",
+          (q || status !== "all" || type !== "all") && "justify-between"
+        )}
+      >
+        {(q || status !== "all" || type !== "all") && (
+          <div className="flex flex-wrap shrink-0 gap-2">
+            <span className="text-sm text-muted-foreground">
+              Active filters:
+            </span>
+            {q && (
+              <Badge variant="outline" className="text-xs">
+                Client: {q}
+              </Badge>
+            )}
+            {status !== "all" && (
+              <Badge variant="outline" className="text-xs capitalize">
+                Status: {status}
+              </Badge>
+            )}
+            {type !== "all" && (
+              <Badge variant="outline" className="text-xs capitalize">
+                Type: {type}
+              </Badge>
+            )}
+            {clients.data.length > 0 && (
+              <Badge variant="outline" className="text-xs">
+                Total: {clients.data.length}
+              </Badge>
+            )}
+          </div>
+        )}
+
+        <div className="flex gap-2 items-center">
+          <Button
+            size="sm"
+            onClick={() => handlePageChange(page - 1)}
+            disabled={page <= 1}
+            variant={page <= 1 ? "outline" : "default"}
+          >
+            Prev
+          </Button>
+          <Button
+            size="sm"
+            onClick={() => handlePageChange(page + 1)}
+            disabled={!clients.hasMore}
+            variant={!clients.hasMore ? "outline" : "default"}
+          >
+            Next
+          </Button>
         </div>
-      )}
+      </div>
     </>
   );
 };

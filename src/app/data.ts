@@ -1,17 +1,53 @@
 "use server";
 
-import { format } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
+import { getMonthAbbreviation } from "@/lib/utils";
 
-export const getClients = async () => {
+export const getClients = async (
+  page: number = 1,
+  pageSize: number = 10,
+  searchTerm?: string,
+  status?: string,
+  type?: string
+) => {
   const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("clients")
-    .select(`*, loans(id, created_at, amount)`);
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
 
-  if (error) return [];
+  let query = supabase
+    .from("all_clients_with_loans")
+    .select(`*`, { count: "exact" });
 
-  return data || [];
+  // Apply search filter
+  if (searchTerm) {
+    query = query.or(
+      `firstName.ilike.%${searchTerm}%,lastName.ilike.%${searchTerm}%`
+    );
+  }
+
+  // Apply status filter
+  if (status && status !== "all") {
+    query = query.eq("status", status);
+  }
+
+  // Apply type filter
+  if (type && type !== "all") {
+    query = query.eq("type", type);
+  }
+
+  query = query.order("created_at", { ascending: false });
+
+  const { data, error, count } = await query.range(from, to);
+
+  if (error || count === null) {
+    return { data: [], hasMore: false, total: 0 };
+  }
+
+  return {
+    data: data ?? [],
+    hasMore: count > to + 1,
+    total: count,
+  };
 };
 
 export const getClientById = async (id: string) => {
@@ -223,7 +259,7 @@ export const getLoanMonthlyStats = async () => {
     if (!loan.created_at || !loan.status) continue;
 
     // Convert date to month name (e.g. Jan, Feb)
-    const month = format(new Date(loan.created_at), "MMM");
+    const month = getMonthAbbreviation(new Date(loan.created_at));
 
     // Initialize month if not exists
     if (!monthlyStats[month]) {

@@ -1,14 +1,12 @@
 "use client";
 
+import { z } from "zod";
+import Link from "next/link";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { Loader2, ArrowLeft, CalendarIcon, Eye, EyeOff } from "lucide-react";
-import Link from "next/link";
-import { format } from "date-fns";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -34,7 +32,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { createLoanOfficer } from "@/app/actions/admin";
-import { cn } from "@/lib/utils";
+import { cn, formatFieldValue } from "@/lib/utils";
 import { addLoanAgentFormSchema } from "@/lib/schema";
 import { toast } from "sonner";
 
@@ -215,7 +213,7 @@ export function AddLoanAgentForm() {
                                 )}
                               >
                                 {field.value ? (
-                                  format(field.value, "PPP")
+                                  formatFieldValue(field.value)
                                 ) : (
                                   <span>Pick a date</span>
                                 )}
