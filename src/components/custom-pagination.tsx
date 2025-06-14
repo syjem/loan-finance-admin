@@ -26,9 +26,8 @@ export const PaginationComponent = ({
   const pages = getPaginationPages(page, totalPages);
 
   return (
-    <Pagination>
+    <Pagination className="flex justify-end">
       <PaginationContent>
-        {/* Previous Button */}
         <PaginationItem>
           <PaginationPrevious
             href=""
@@ -60,7 +59,6 @@ export const PaginationComponent = ({
           </PaginationItem>
         ))}
 
-        {/* Next Button */}
         <PaginationItem>
           <PaginationNext
             href=""

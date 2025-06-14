@@ -43,15 +43,15 @@ export function DataTable({
   };
 
   const handlePageChange = (newPage: number) => {
-    const page = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams);
 
     if (newPage === 1) {
-      page.delete("page");
+      params.delete("page");
     } else {
-      page.set("page", newPage.toString());
+      params.set("page", newPage.toString());
     }
 
-    const pageParams = page.toString();
+    const pageParams = params.toString();
 
     router.push(`${pathname}?${pageParams ? `${pageParams}` : ""}`);
   };

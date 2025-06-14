@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,6 +34,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { CLientType } from "@/lib/types";
+import { PaginationComponent } from "@/components/custom-pagination";
 
 type DataTableProps = {
   q: string;
@@ -51,28 +52,27 @@ const DataTable = ({ q, status, type, page, clients }: DataTableProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
   const handleViewClient = (clientId: string) => {
     router.push(`/clients/${clientId}`);
   };
 
   const handlePageChange = (newPage: number) => {
-    const page = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams);
 
     if (newPage === 1) {
-      page.delete("page");
+      params.delete("page");
     } else {
-      page.set("page", newPage.toString());
+      params.set("page", newPage.toString());
     }
 
-    const pageParams = page.toString();
+    const pageParams = params.toString();
 
     router.push(`${pathname}?${pageParams ? `${pageParams}` : ""}`);
   };
 
   return (
-    <>
+    <React.Fragment>
       <Table className="rounded-md">
         <TableHeader>
           <TableRow>
@@ -83,9 +83,6 @@ const DataTable = ({ q, status, type, page, clients }: DataTableProps) => {
               <Button
                 variant="ghost"
                 className="data-[state=open]:bg-accent cursor-pointer"
-                onClick={() =>
-                  setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"))
-                }
               >
                 Total Loans
                 <ArrowUpDown className="h-4 w-4" />
@@ -267,26 +264,15 @@ const DataTable = ({ q, status, type, page, clients }: DataTableProps) => {
           </div>
         )}
 
-        <div className="flex gap-2 items-center">
-          <Button
-            size="sm"
-            onClick={() => handlePageChange(page - 1)}
-            disabled={page <= 1}
-            variant={page <= 1 ? "outline" : "default"}
-          >
-            Prev
-          </Button>
-          <Button
-            size="sm"
-            onClick={() => handlePageChange(page + 1)}
-            disabled={!clients.hasMore}
-            variant={!clients.hasMore ? "outline" : "default"}
-          >
-            Next
-          </Button>
-        </div>
+        <PaginationComponent
+          page={page}
+          totalItems={clients.total}
+          perPage={10}
+          hasMore={clients.hasMore}
+          onPageChange={handlePageChange}
+        />
       </div>
-    </>
+    </React.Fragment>
   );
 };
 
