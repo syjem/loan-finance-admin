@@ -23,7 +23,7 @@ export default async function LoansPage({
 
   const perPage = 10;
 
-  const { data, hasMore } = await getAllLoans(page, perPage, query, status);
+  const { data, hasMore, total } = await getAllLoans(page, perPage, query, status);
 
   return (
     <div className="container space-y-6">
@@ -46,6 +46,7 @@ export default async function LoansPage({
         status={status}
         page={page}
         hasMore={hasMore}
+        total={total}
       />
     </div>
   );

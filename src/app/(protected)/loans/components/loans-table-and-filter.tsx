@@ -40,12 +40,14 @@ const LoansTableAndFilter = ({
   status,
   page,
   hasMore,
+  total,
 }: {
   loans: LoanType;
   query: string;
   status: string;
   page: number;
   hasMore: boolean;
+  total: number;
 }) => {
   const [searchTerm, setSearchTerm] = useState(query);
   const [statusFilter, setStatusFilter] = useState(status);
@@ -172,6 +174,7 @@ const LoansTableAndFilter = ({
             loans={loans}
             page={page}
             hasMore={hasMore}
+            total={total}
           />
         </CardContent>
       </Card>

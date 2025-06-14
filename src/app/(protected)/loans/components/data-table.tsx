@@ -23,6 +23,7 @@ interface DataTableProps {
   page: number;
   loans: LoanType;
   hasMore: boolean;
+  total: number;
 }
 
 export function DataTable({
@@ -31,6 +32,7 @@ export function DataTable({
   page,
   loans,
   hasMore,
+  total,
 }: DataTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -166,7 +168,7 @@ export function DataTable({
         )}
         <PaginationComponent
           page={page}
-          totalItems={loans.length}
+          totalItems={total}
           perPage={10}
           hasMore={hasMore}
           onPageChange={handlePageChange}

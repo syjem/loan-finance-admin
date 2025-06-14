@@ -113,27 +113,38 @@ export function getPaginationPages(
     return pages;
   }
 
-  // Always show the first page
+  // Always show first page
   pages.push(1);
 
-  // Show ellipsis if needed before current - 1
-  if (current > 3) {
+  // Calculate the range of pages to show
+  let start = Math.max(2, current - 1);
+  let end = Math.min(total - 1, current + 1);
+
+  // Adjust start and end to always show 5 pages
+  if (current <= 3) {
+    // Near start: show 1, 2, 3, 4, ...
+    end = 4;
+  } else if (current >= total - 2) {
+    // Near end: show ..., total-3, total-2, total-1, total
+    start = total - 3;
+  }
+
+  // Add ellipsis if needed before the range
+  if (start > 2) {
     pages.push("...");
   }
 
-  // Show middle pages around current
-  const start = Math.max(2, current - 1);
-  const end = Math.min(total - 1, current + 1);
+  // Add the range of pages
   for (let i = start; i <= end; i++) {
     pages.push(i);
   }
 
-  // Show ellipsis if needed after current + 1
-  if (current < total - 2) {
+  // Add ellipsis if needed after the range
+  if (end < total - 1) {
     pages.push("...");
   }
 
-  // Always show the last page
+  // Always show last page
   pages.push(total);
 
   return pages;
