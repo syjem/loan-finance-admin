@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import LoansTableAndFilter from "./components/loans-table-and-filter";
 import { getAllLoans } from "@/app/data";
+import { PlusIcon } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Loan Applications",
@@ -23,7 +24,12 @@ export default async function LoansPage({
 
   const perPage = 10;
 
-  const { data, hasMore, total } = await getAllLoans(page, perPage, query, status);
+  const { data, hasMore, total } = await getAllLoans(
+    page,
+    perPage,
+    query,
+    status
+  );
 
   return (
     <div className="container space-y-6">
@@ -36,7 +42,10 @@ export default async function LoansPage({
           </h1>
         </div>
         <Button asChild>
-          <Link href="/loans/new">New Application</Link>
+          <Link href="/loans/new" className="flex items-center">
+            <PlusIcon />
+            New Application
+          </Link>
         </Button>
       </header>
 

@@ -135,13 +135,6 @@ export const getLoanStats = async () => {
   };
 };
 
-export const getClientsTotalValue = async () => {
-  const supabase = await createClient();
-  const { data } = await supabase.from("clients_total_value").select("*");
-
-  return data;
-};
-
 export const getRecentLoanApplications = async () => {
   const supabase = await createClient();
   const { data } = await supabase.from("recent_loan_applications").select("*");

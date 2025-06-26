@@ -179,7 +179,7 @@ export function LoanStatusManager({ loan }: { loan: Loan }) {
               <Button
                 variant="destructive"
                 size="sm"
-                className="cursor-pointer w-full bg-rose-100 text-rose-800 dark:bg-rose-800 dark:text-rose-100 hover:dark:bg-rose-800/80"
+                className="cursor-pointer w-full bg-red-100 hover:bg-red-200 text-red-800 dark:bg-red-800 dark:text-red-100 hover:dark:bg-red-800/80"
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete Loan
@@ -202,7 +202,7 @@ export function LoanStatusManager({ loan }: { loan: Loan }) {
                 <AlertDialogAction
                   onClick={handleDeleteLoan}
                   disabled={isDeleting}
-                  className="bg-rose-100 text-rose-800 dark:bg-rose-800 dark:text-rose-100 hover:dark:bg-rose-800/80"
+                  className="bg-red-100 hover:bg-red-200 text-red-800 dark:bg-red-800 dark:text-red-100 hover:dark:bg-red-800/80"
                 >
                   {isDeleting ? "Deleting..." : "Delete Loan"}
                 </AlertDialogAction>

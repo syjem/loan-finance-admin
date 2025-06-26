@@ -13,6 +13,7 @@ import {
   getBusinessClients,
   getClientsThisMonth,
 } from "@/app/data";
+import { PlusIcon } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Client Management",
@@ -62,7 +63,10 @@ export default async function ClientsPage({
           </h1>
         </div>
         <Button asChild>
-          <Link href="/clients/new">Add Client</Link>
+          <Link href="/clients/new" className="flex items-center">
+            <PlusIcon />
+            New Client
+          </Link>
         </Button>
       </header>
       <div className="container space-y-6">

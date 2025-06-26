@@ -7,7 +7,6 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { DealStatusChart } from "./components/deals-status-chart";
 import RecentApplicationTable from "@/components/recent-applications-table";
 import { MonthlyDealsChart } from "./components/monthly-deals-chart";
-import ClientsOverviewChart from "./components/clients-overview-chart";
 import OverviewCards from "@/app/(protected)/dashboard/components/overview-cards";
 import {
   Card,
@@ -19,11 +18,11 @@ import {
 import {
   getTotalNumberOfClients,
   getLoanStats,
-  getClientsTotalValue,
   getRecentLoanApplications,
   getLoanStatusPercentage,
   getLoanMonthlyStats,
 } from "@/app/data";
+import { PlusIcon } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -33,14 +32,12 @@ export default async function Dashboard() {
   const [
     numberOfClients,
     stats,
-    clientsTotalValue,
     recentLoanApplications,
     loanStatusStats,
     loanMonthlyStats,
   ] = await Promise.all([
     getTotalNumberOfClients(),
     getLoanStats(),
-    getClientsTotalValue(),
     getRecentLoanApplications(),
     getLoanStatusPercentage(),
     getLoanMonthlyStats(),
@@ -56,7 +53,10 @@ export default async function Dashboard() {
         </div>
 
         <Button asChild>
-          <Link href="/loans/new">New Loan Application</Link>
+          <Link href="/loans/new" className="flex items-center">
+            <PlusIcon />
+            New Loan Application
+          </Link>
         </Button>
       </header>
 
@@ -99,17 +99,6 @@ export default async function Dashboard() {
             />
           </CardContent>
         </Card>
-
-        <div className="grid auto-rows-fr gap-4 md:grid-cols-3 items-stretch">
-          <Card className="bg-muted/50 col-span-1 md:col-span-2">
-            <CardHeader>
-              <CardTitle>Clients Overview</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ClientsOverviewChart clientsTotalValue={clientsTotalValue} />
-            </CardContent>
-          </Card>
-        </div>
       </div>
     </React.Fragment>
   );

@@ -138,7 +138,7 @@ export async function updateLoanStatus(id: number, status: string) {
 export async function deleteLoan(id: number) {
   const supabase = await createClient();
 
-  const { error } = await supabase.from("loans").delete().eq("id", id).select();
+  const { error } = await supabase.from("loans").delete().eq("id", id);
 
   if (error) {
     return {
